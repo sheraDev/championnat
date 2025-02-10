@@ -8,7 +8,7 @@ import java.util.List;
 public class ClubDAO {
     private static final String URL = "jdbc:mariadb://localhost:3306/championnat_football";
     private static final String LOGIN = "root";
-    private static final String PASS = "ton_mot_de_passe";
+    private static final String PASS = "root";
 
     public ClubDAO() {
         try {
@@ -74,8 +74,9 @@ public class ClubDAO {
     /**
      * Test du DAO
      */
-    public static void main(String[] args) {
-        ClubDAO clubDAO = new ClubDAO();
+    public static void main(String[] args) 
+    {
+        /*ClubDAO clubDAO = new ClubDAO();
 
         // Ajout de clubs
         clubDAO.ajouterClub("Paris Saint-Germain", "Paris");
@@ -96,6 +97,6 @@ public class ClubDAO {
         System.out.println("Liste après suppression :");
         for (String club : clubs) {
             System.out.println(club);
-        }
+        } */
     }
 }
