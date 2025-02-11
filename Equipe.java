@@ -3,8 +3,9 @@ public class Equipe {
     private String club;
     private String division;
     private String sexe;
+    private String niveau;
 
-    public Equipe(String nom, String club, String division, String sexe) {
+    public Equipe(String nom, String club, String division, String sexe,String niveau) {
         this.nom = nom;
         this.club = club;
         this.division = division;
@@ -25,5 +26,9 @@ public class Equipe {
 
     public String getSexe() {
         return sexe;
+    }
+
+    public String getNiveau(){
+        return niveau;
     }
 }

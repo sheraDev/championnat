@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -14,6 +13,7 @@ public class EquipesPanel extends JPanel {
     // Composants du formulaire
     private JTextField nomField;
     private JTextField divisionField;
+    private JTextField niveauField;  // Nouveau champ pour le niveau
     private JComboBox<String> clubCombo; // Liste déroulante pour les clubs
     private JComboBox<String> sexeCombo;
 
@@ -53,6 +53,7 @@ public class EquipesPanel extends JPanel {
                     selectedEquipeNom = selectedEquipe.getNom();
                     nomField.setText(selectedEquipe.getNom());
                     divisionField.setText(selectedEquipe.getDivision());
+                    niveauField.setText(selectedEquipe.getNiveau()); // Remplissage du niveau
                     // Sélectionne dans le combo le club correspondant
                     for (int i = 0; i < clubCombo.getItemCount(); i++) {
                         String item = clubCombo.getItemAt(i);
@@ -68,7 +69,9 @@ public class EquipesPanel extends JPanel {
         });
 
         // ---------- Partie formulaire d'ajout/modification ----------
-        JPanel formPanel = new JPanel(new GridLayout(4, 2, 5, 5));
+        // On passe à une grille à 5 lignes : Nom, Club, Division, Niveau, Sexe
+        JPanel formPanel = new JPanel(new GridLayout(5, 2, 5, 5));
+        
         formPanel.add(new JLabel("Nom de l'équipe :"));
         nomField = new JTextField();
         formPanel.add(nomField);
@@ -86,6 +89,10 @@ public class EquipesPanel extends JPanel {
         divisionField = new JTextField();
         formPanel.add(divisionField);
 
+        formPanel.add(new JLabel("Niveau :"));  // Nouvelle ligne pour le niveau
+        niveauField = new JTextField();
+        formPanel.add(niveauField);
+
         formPanel.add(new JLabel("Sexe :"));
         String[] sexes = {"M", "F"};
         sexeCombo = new JComboBox<>(sexes);
@@ -102,7 +109,7 @@ public class EquipesPanel extends JPanel {
         buttonPanel.add(addButton);
         buttonPanel.add(modifyButton);
         buttonPanel.add(deleteButton);
-        buttonPanel.add(addClubPopupButton);  // Ajout du bouton
+        buttonPanel.add(addClubPopupButton);
 
         // Conteneur pour le formulaire et les boutons
         JPanel southPanel = new JPanel(new BorderLayout());
@@ -113,23 +120,18 @@ public class EquipesPanel extends JPanel {
         // Chargement initial des équipes depuis la base
         loadEquipes();
 
-        // Action sur le bouton "Ajouter Équipe"
+        // Actions sur les boutons
         addButton.addActionListener(e -> ajouterEquipe());
-        // Action sur le bouton "Modifier Équipe"
         modifyButton.addActionListener(e -> modifierEquipe());
-        // Action sur le bouton "Supprimer Équipe"
         deleteButton.addActionListener(e -> supprimerEquipe());
-
-        // Action sur le bouton "Ajouter un Club" qui ouvre une popup
         addClubPopupButton.addActionListener(e -> {
-            // Créer une fenêtre modale (JDialog) pour le ClubsPanel
+            // Créer une fenêtre modale pour la gestion des clubs
             JDialog clubDialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Gestion des Clubs", Dialog.ModalityType.APPLICATION_MODAL);
             clubDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             clubDialog.setContentPane(new ClubsPanel());
             clubDialog.pack();
             clubDialog.setLocationRelativeTo(this);
             clubDialog.setVisible(true);
-            
             // Après fermeture de la popup, on rafraîchit la liste des clubs dans le combo
             refreshClubCombo();
         });
@@ -160,11 +162,12 @@ public class EquipesPanel extends JPanel {
     private void ajouterEquipe() {
         String nom = nomField.getText().trim();
         String division = divisionField.getText().trim();
+        String niveau = niveauField.getText().trim();  // Récupération du niveau
         String sexe = (String) sexeCombo.getSelectedItem();
         String clubDisplay = (String) clubCombo.getSelectedItem();
         String clubName = clubDisplay.split(" - ")[0].trim();
 
-        if (nom.isEmpty() || division.isEmpty() || clubName.isEmpty()) {
+        if (nom.isEmpty() || division.isEmpty() || clubName.isEmpty() || niveau.isEmpty()) {  // Vérification du niveau aussi
             JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs.");
             return;
         }
@@ -175,7 +178,8 @@ public class EquipesPanel extends JPanel {
             return;
         }
 
-        int result = equipeDAO.ajouterEquipe(nom, clubId, division, sexe);
+        // Appel au DAO pour ajouter l'équipe (supposé prendre en compte le niveau)
+        int result = equipeDAO.ajouterEquipe(nom, clubId, division, sexe, niveau);
         if (result > 0) {
             JOptionPane.showMessageDialog(this, "Équipe ajoutée avec succès !");
             loadEquipes();
@@ -195,11 +199,12 @@ public class EquipesPanel extends JPanel {
         }
         String nouveauNom = nomField.getText().trim();
         String division = divisionField.getText().trim();
+        String niveau = niveauField.getText().trim();  // Récupération du niveau
         String sexe = (String) sexeCombo.getSelectedItem();
         String clubDisplay = (String) clubCombo.getSelectedItem();
         String clubName = clubDisplay.split(" - ")[0].trim();
 
-        if (nouveauNom.isEmpty() || division.isEmpty() || clubName.isEmpty()) {
+        if (nouveauNom.isEmpty() || division.isEmpty() || clubName.isEmpty() || niveau.isEmpty()) {  // Vérification du niveau
             JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs.");
             return;
         }
@@ -210,7 +215,8 @@ public class EquipesPanel extends JPanel {
             return;
         }
 
-        int result = equipeDAO.modifierEquipe(selectedEquipeNom, nouveauNom, clubId, division, sexe);
+        // Appel au DAO pour modifier l'équipe (supposé prendre en compte le niveau)
+        int result = equipeDAO.modifierEquipe(selectedEquipeNom, nouveauNom, clubId, division, sexe, niveau);
         if (result > 0) {
             JOptionPane.showMessageDialog(this, "Équipe modifiée avec succès !");
             loadEquipes();
@@ -251,6 +257,7 @@ public class EquipesPanel extends JPanel {
     private void clearForm() {
         nomField.setText("");
         divisionField.setText("");
+        niveauField.setText("");  // Réinitialisation du champ niveau
         clubCombo.setSelectedIndex(0);
         sexeCombo.setSelectedIndex(0);
     }
@@ -260,7 +267,8 @@ public class EquipesPanel extends JPanel {
      */
     class EquipeTableModel extends AbstractTableModel {
         private List<Equipe> equipes = new ArrayList<>();
-        private final String[] columnNames = {"Nom", "Division", "Sexe", "Club"};
+        // Ajout de la colonne "Niveau"
+        private final String[] columnNames = {"Nom", "Division", "Sexe", "Club", "Niveau"};
 
         public void setEquipes(List<Equipe> equipes) {
             this.equipes = equipes;
@@ -289,6 +297,7 @@ public class EquipesPanel extends JPanel {
                 case 1: return eq.getDivision();
                 case 2: return eq.getSexe();
                 case 3: return eq.getClub();
+                case 4: return eq.getNiveau(); // Affichage du niveau
                 default: return "";
             }
         }

@@ -25,11 +25,12 @@ public class EquipeDAO {
      * @param clubId L'identifiant du club (clé étrangère référant à la table Club)
      * @param division La division dans laquelle l'équipe évolue
      * @param sexe Le sexe de l'équipe ("M" pour masculin ou "F" pour féminin)
+     * @param niveau Le niveau de l'équipe
      * @return Le nombre de lignes affectées (normalement 1 en cas de succès)
      */
-    public int ajouterEquipe(String nom, int clubId, String division, String sexe) {
+    public int ajouterEquipe(String nom, int clubId, String division, String sexe, String niveau) {
         int rowsAffected = 0;
-        String sql = "INSERT INTO Equipe (nom, club_id, division, sexe) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Equipe (nom, club_id, division, sexe, niveau) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(URL, LOGIN, PASS);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -37,6 +38,7 @@ public class EquipeDAO {
             ps.setInt(2, clubId);
             ps.setString(3, division);
             ps.setString(4, sexe);
+            ps.setString(5, niveau);
             rowsAffected = ps.executeUpdate();
             System.out.println("Équipe ajoutée : " + nom);
         } catch (SQLException ex) {
@@ -45,16 +47,27 @@ public class EquipeDAO {
         return rowsAffected;
     }
 
-    public int modifierEquipe(String ancienNom, String nouveauNom, int clubId, String division, String sexe) {
+    /**
+     * Modifie une équipe existante dans la table Equipe.
+     * @param ancienNom Le nom de l'équipe à modifier.
+     * @param nouveauNom Le nouveau nom de l'équipe.
+     * @param clubId L'identifiant du club.
+     * @param division La division.
+     * @param sexe Le sexe de l'équipe.
+     * @param niveau Le nouveau niveau de l'équipe.
+     * @return Le nombre de lignes affectées (normalement 1 en cas de succès)
+     */
+    public int modifierEquipe(String ancienNom, String nouveauNom, int clubId, String division, String sexe, String niveau) {
         int rowsAffected = 0;
-        String sql = "UPDATE Equipe SET nom = ?, club_id = ?, division = ?, sexe = ? WHERE nom = ?";
+        String sql = "UPDATE Equipe SET nom = ?, club_id = ?, division = ?, sexe = ?, niveau = ? WHERE nom = ?";
         try (Connection conn = DriverManager.getConnection(URL, LOGIN, PASS);
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, nouveauNom);
             ps.setInt(2, clubId);
             ps.setString(3, division);
             ps.setString(4, sexe);
-            ps.setString(5, ancienNom);
+            ps.setString(5, niveau);
+            ps.setString(6, ancienNom);
             rowsAffected = ps.executeUpdate();
             System.out.println("Équipe modifiée : " + nouveauNom);
         } catch (SQLException ex) {
@@ -70,8 +83,8 @@ public class EquipeDAO {
      */
     public List<Equipe> getListeEquipes() {
         List<Equipe> equipes = new ArrayList<>();
-        // La requête réalise une jointure entre Equipe et Club
-        String sql = "SELECT e.nom, c.nom AS club, e.division, e.sexe " +
+        // La requête réalise une jointure entre Equipe et Club et récupère le niveau
+        String sql = "SELECT e.nom, c.nom AS club, e.division, e.sexe, e.niveau " +
                      "FROM Equipe e JOIN Club c ON e.club_id = c.id";
         try (Connection conn = DriverManager.getConnection(URL, LOGIN, PASS);
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -82,7 +95,9 @@ public class EquipeDAO {
                 String club = rs.getString("club");
                 String division = rs.getString("division");
                 String sexe = rs.getString("sexe");
-                equipes.add(new Equipe(nom, club, division, sexe));
+                String niveau = rs.getString("niveau");
+                // Assurez-vous que la classe Equipe possède un constructeur prenant ces 5 paramètres
+                equipes.add(new Equipe(nom, club, division, sexe, niveau));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -111,26 +126,25 @@ public class EquipeDAO {
     }
 
     /**
- * Récupère l'identifiant d'une équipe à partir de son nom.
- * @param nom Le nom de l'équipe.
- * @return L'identifiant de l'équipe si trouvée, -1 sinon.
- */
-public int getEquipeId(String nom) {
-    int id = -1;
-    String sql = "SELECT id FROM Equipe WHERE nom = ?";
-    try (Connection conn = DriverManager.getConnection(URL, LOGIN, PASS);
-         PreparedStatement ps = conn.prepareStatement(sql)) {
+     * Récupère l'identifiant d'une équipe à partir de son nom.
+     * @param nom Le nom de l'équipe.
+     * @return L'identifiant de l'équipe si trouvée, -1 sinon.
+     */
+    public int getEquipeId(String nom) {
+        int id = -1;
+        String sql = "SELECT id FROM Equipe WHERE nom = ?";
+        try (Connection conn = DriverManager.getConnection(URL, LOGIN, PASS);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
          
-         ps.setString(1, nom);
-         try (ResultSet rs = ps.executeQuery()) {
-             if (rs.next()) {
-                 id = rs.getInt("id");
-             }
-         }
-    } catch (SQLException ex) {
-         ex.printStackTrace();
+            ps.setString(1, nom);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    id = rs.getInt("id");
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return id;
     }
-    return id;
-}
-
 }
