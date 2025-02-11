@@ -6,9 +6,9 @@ import java.util.List;
  * DAO pour la gestion des matchs.
  */
 public class MatchDAO {
-    private static final String URL = "jdbc:mariadb://localhost:3306/championnat_football";
-    private static final String LOGIN = "root";
-    private static final String PASS = "root";
+    private static final String URL = DatabaseConfig.getProperty("db.url");
+    private static final String LOGIN = DatabaseConfig.getProperty("db.user");
+    private static final String PASS = DatabaseConfig.getProperty("db.password");
 
     public MatchDAO() {
         try {
