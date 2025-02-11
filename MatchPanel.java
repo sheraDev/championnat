@@ -15,13 +15,13 @@ public class MatchPanel extends JPanel {
     // Composants du formulaire
     private JComboBox<String> equipeDomicileCombo;
     private JComboBox<String> equipeExterieurCombo;
-    private JComboBox<String> championnatCombo; // Pour le championnat
-    private JComboBox<String> stadeCombo;        // Pour le stade
+    private JComboBox<String> championnatCombo; 
+    private JComboBox<String> stadeCombo;        
     private JComboBox<String> arbitreCombo;
     private JTextField dateMatchField;
-    private JComboBox<String> statutCombo;       // Nouveau combo pour le statut
-    private JTextField scoreDomicileField;       // Champ pour le score domicile
-    private JTextField scoreExterieurField;      // Champ pour le score extérieur
+    private JComboBox<String> statutCombo;       
+    private JTextField scoreDomicileField;       
+    private JTextField scoreExterieurField;      
 
     // Boutons d'actions
     private JButton addButton;
@@ -351,7 +351,6 @@ public class MatchPanel extends JPanel {
     // --- Modèle de table personnalisé pour les matchs ---
     class MatchTableModel extends AbstractTableModel {
         private List<Match> matches = new ArrayList<>();
-        // On ajoute la colonne Statut entre Date et Score Domicile
         private final String[] columnNames = {"ID", "Domicile", "Extérieur", "Championnat", "Stade", "Arbitre", "Date", "Statut", "Score D", "Score E"};
 
         public void setMatches(List<Match> matches) {
@@ -404,11 +403,11 @@ public class MatchPanel extends JPanel {
         private int id;
         private String equipeDomicile;
         private String equipeExterieur;
-        private String championnat; // Stocke le nom du championnat
+        private String championnat; 
         private String stade;
         private String arbitre;
         private String dateMatch;
-        private String statut;     // Nouveau champ statut
+        private String statut;     
         private int scoreDomicile;
         private int scoreExterieur;
 
@@ -467,7 +466,6 @@ public class MatchPanel extends JPanel {
         }
     }
 
-    // Méthode main pour tester le panel indépendamment
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Gestion des Matchs");

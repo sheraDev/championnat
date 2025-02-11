@@ -108,10 +108,5 @@ public class ArbitreDAO {
     }
     
     public static void main(String[] args) {
-        ArbitreDAO arbitreDAO = new ArbitreDAO();
-        
-        // Ajouter des arbitres
-        arbitreDAO.ajouterArbitre("Pierre Dupont");
-        arbitreDAO.ajouterArbitre("Jean Martin");
     }
 }

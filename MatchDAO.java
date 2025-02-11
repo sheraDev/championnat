@@ -21,7 +21,6 @@ public class MatchDAO {
 
     /**
      * Ajouter un match dans la base de données.
-     * Le nouveau paramètre 'statut' est ajouté.
      */
     public int ajouterMatch(int equipeDomicile, int equipeExterieur, int championnatId, int stadeId, int arbitreId,
                             String dateMatch, int scoreDomicile, int scoreExterieur, String statut) {
@@ -50,7 +49,6 @@ public class MatchDAO {
 
     /**
      * Récupère la liste des matchs sous forme de chaînes.
-     * On ajoute la colonne 'statut' dans la requête.
      */
     public List<String> getListeMatchs() {
         List<String> matchs = new ArrayList<>();
@@ -83,7 +81,6 @@ public class MatchDAO {
 
     /**
      * Met à jour le score d'un match.
-     * (La mise à jour du statut n'est pas gérée ici.)
      */
     public int mettreAJourScore(int matchId, int scoreDomicile, int scoreExterieur) {
         int retour = 0;
@@ -190,37 +187,7 @@ public class MatchDAO {
         return retour;
     }
 
-    /**
-     * Test du DAO.
-     */
+    /
     public static void main(String[] args) {
-        MatchDAO matchDAO = new MatchDAO();
-
-        // Exemple d'ajout de match (avec scores initialisés à 0 et statut "prevu")
-        int matchId = matchDAO.ajouterMatch(1, 2, 1, 1, 1, "2024-03-10 15:00:00", 0, 0, "prevu");
-
-        // Affichage des matchs
-        List<String> matchs = matchDAO.getListeMatchs();
-        System.out.println("Liste des matchs :");
-        for (String match : matchs) {
-            System.out.println(match);
-        }
-
-        // Mise à jour du score d'un match
-        if (matchId > 0) {
-            matchDAO.mettreAJourScore(matchId, 2, 1);
-        }
-
-        // Suppression d'un match
-        if (matchId > 0) {
-            matchDAO.supprimerMatch(matchId);
-        }
-
-        // Affichage après suppression
-        matchs = matchDAO.getListeMatchs();
-        System.out.println("Liste après suppression :");
-        for (String match : matchs) {
-            System.out.println(match);
-        }
     }
 }

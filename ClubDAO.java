@@ -19,6 +19,9 @@ public class ClubDAO {
         }
     }
 
+    /**
+     * Cree un club
+     */
     public int ajouterClub(String nom, String ville) {
         int retour = 0;
         try (Connection con = DriverManager.getConnection(URL, LOGIN, PASS);
@@ -105,32 +108,8 @@ public class ClubDAO {
     }
     
 
-    /**
-     * Test du DAO
-     */
+  
     public static void main(String[] args) 
     {
-        /*ClubDAO clubDAO = new ClubDAO();
-
-        // Ajout de clubs
-        clubDAO.ajouterClub("Paris Saint-Germain", "Paris");
-        clubDAO.ajouterClub("Olympique de Marseille", "Marseille");
-
-        // Affichage des clubs
-        List<String> clubs = clubDAO.getListeClubs();
-        System.out.println("Liste des clubs :");
-        for (String club : clubs) {
-            System.out.println(club);
-        }
-
-        // Suppression d'un club
-        clubDAO.supprimerClub("Olympique de Marseille");
-
-        // Affichage après suppression
-        clubs = clubDAO.getListeClubs();
-        System.out.println("Liste après suppression :");
-        for (String club : clubs) {
-            System.out.println(club);
-        } */
     }
 }

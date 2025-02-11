@@ -83,7 +83,6 @@ public class EquipeDAO {
      */
     public List<Equipe> getListeEquipes() {
         List<Equipe> equipes = new ArrayList<>();
-        // La requête réalise une jointure entre Equipe et Club et récupère le niveau
         String sql = "SELECT e.nom, c.nom AS club, e.division, e.sexe, e.niveau " +
                      "FROM Equipe e JOIN Club c ON e.club_id = c.id";
         try (Connection conn = DriverManager.getConnection(URL, LOGIN, PASS);
@@ -96,7 +95,6 @@ public class EquipeDAO {
                 String division = rs.getString("division");
                 String sexe = rs.getString("sexe");
                 String niveau = rs.getString("niveau");
-                // Assurez-vous que la classe Equipe possède un constructeur prenant ces 5 paramètres
                 equipes.add(new Equipe(nom, club, division, sexe, niveau));
             }
         } catch (SQLException ex) {

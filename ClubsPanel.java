@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClubsPanel extends JPanel {
-    // Composants d'affichage : un JTable pour visualiser les clubs
+    // Composants d'affichage 
     private JTable clubsTable;
     private ClubsTableModel tableModel;
 
@@ -19,11 +19,9 @@ public class ClubsPanel extends JPanel {
     // Accès aux données via le DAO
     private ClubDAO clubDAO;
 
-    // Pour mémoriser le club sélectionné (pour la suppression)
     private String selectedClubNom = null;
 
     public ClubsPanel() {
-        // Instanciation du DAO
         clubDAO = new ClubDAO();
 
         setLayout(new BorderLayout(10, 10));
@@ -42,7 +40,6 @@ public class ClubsPanel extends JPanel {
                 if (selectedRow != -1) {
                     Club selectedClub = tableModel.getClubAt(selectedRow);
                     selectedClubNom = selectedClub.getNom();
-                    // Remplissage du formulaire (facultatif) avec les données du club sélectionné
                     nomField.setText(selectedClub.getNom());
                     villeField.setText(selectedClub.getVille());
                 }
@@ -74,9 +71,7 @@ public class ClubsPanel extends JPanel {
         // Chargement initial de la liste des clubs
         loadClubs();
 
-        // Action sur le bouton "Ajouter Club"
         addButton.addActionListener(e -> ajouterClub());
-        // Action sur le bouton "Supprimer Club"
         deleteButton.addActionListener(e -> supprimerClub());
     }
 
@@ -185,7 +180,6 @@ public class ClubsPanel extends JPanel {
         }
     }
 
-    // Méthode main pour tester le panel indépendamment
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Gestion des Clubs");
