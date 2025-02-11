@@ -16,15 +16,15 @@ public class ArbitreDAO {
         }
     }
 
-    public int ajouterArbitre(String nom, String categorie) {
+    public int ajouterArbitre(String nom) {
         int retour = 0;
-        String query = "INSERT INTO Arbitre (nom, categorie) VALUES (?, ?)";
+        String query = "INSERT INTO Arbitre (nom) VALUES (?)";
         try (Connection con = DriverManager.getConnection(URL, LOGIN, PASS);
              PreparedStatement ps = con.prepareStatement(query)) {
             ps.setString(1, nom);
-            ps.setString(2, categorie);
+            
             retour = ps.executeUpdate();
-            System.out.println("Arbitre ajouté : " + nom + " - Catégorie : " + categorie);
+            System.out.println("Arbitre ajouté : " + nom );
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -38,7 +38,7 @@ public class ArbitreDAO {
              PreparedStatement ps = con.prepareStatement(query);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                arbitres.add(rs.getString("nom") + " - " + rs.getString("categorie"));
+                arbitres.add(rs.getString("nom") );
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -60,28 +60,34 @@ public class ArbitreDAO {
         return retour;
     }
 
+    public int getArbitreIdByDisplay(String display) {
+        int id = -1;
+        // On s'attend à un format "Nom - Prénom"
+        String[] parts = display.split(" - ");
+        if (parts.length < 1) return id; // Vérifier que le format est correct
+        String nom = parts[0].trim();
+        // On pourrait également vérifier un prénom si nécessaire, mais ici on suppose uniquement le nom
+        String query = "SELECT id FROM Arbitre WHERE nom = ?";
+        try (Connection con = DriverManager.getConnection(URL, LOGIN, PASS);
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setString(1, nom);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    id = rs.getInt("id");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return id;
+    }
+    
+
     public static void main(String[] args) {
         ArbitreDAO arbitreDAO = new ArbitreDAO();
         
         // Ajouter des arbitres
-        arbitreDAO.ajouterArbitre("Pierre Dupont", "Principal");
-        arbitreDAO.ajouterArbitre("Jean Martin", "Assistant");
-        
-        // Afficher les arbitres
-        List<String> arbitres = arbitreDAO.getListeArbitres();
-        System.out.println("Liste des arbitres :");
-        for (String arbitre : arbitres) {
-            System.out.println(arbitre);
-        }
-        
-        // Supprimer un arbitre
-        arbitreDAO.supprimerArbitre("Jean Martin");
-        
-        // Afficher après suppression
-        arbitres = arbitreDAO.getListeArbitres();
-        System.out.println("Liste après suppression :");
-        for (String arbitre : arbitres) {
-            System.out.println(arbitre);
-        }
+        arbitreDAO.ajouterArbitre("Pierre Dupont");
+        arbitreDAO.ajouterArbitre("Jean Martin");
     }
 }

@@ -71,6 +71,40 @@ public class ClubDAO {
         return retour;
     }
 
+    public List<Club> getClubs() {
+        List<Club> clubs = new ArrayList<>();
+        try (Connection con = DriverManager.getConnection(URL, LOGIN, PASS);
+             PreparedStatement ps = con.prepareStatement("SELECT * FROM Club");
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String nom = rs.getString("nom");
+                String ville = rs.getString("ville");
+                clubs.add(new Club(id, nom, ville));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return clubs;
+    }
+    public int getClubId(String clubName) {
+        int id = -1;
+        try (Connection con = DriverManager.getConnection(URL, LOGIN, PASS);
+             PreparedStatement ps = con.prepareStatement("SELECT id FROM Club WHERE nom = ?")) {
+            ps.setString(1, clubName);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                id = rs.getInt("id");
+            }
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return id;
+    }
+    
+
     /**
      * Test du DAO
      */

@@ -75,6 +75,29 @@ public class ChampionnatDAO {
     }
 
     /**
+ * Récupère l'identifiant d'un championnat à partir de son nom.
+ * @param nom Le nom du championnat.
+ * @return L'identifiant du championnat s'il est trouvé, -1 sinon.
+ */
+public int getChampionnatId(String nom) {
+    int id = -1;
+    String sql = "SELECT id FROM Championnat WHERE nom = ?";
+    try (Connection con = DriverManager.getConnection(URL, LOGIN, PASS);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, nom);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                id = rs.getInt("id");
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return id;
+}
+
+
+    /**
      * Test du DAO
      */
     public static void main(String[] args) {

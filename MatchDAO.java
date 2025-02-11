@@ -109,6 +109,71 @@ public class MatchDAO {
         return retour;
     }
 
+
+    // Nouvelle méthode pour retourner la liste des matchs sous forme d'objets
+    public List<MatchPanel.Match> getListeMatchsObjects() {
+        List<MatchPanel.Match> matches = new ArrayList<>();
+        try (Connection con = DriverManager.getConnection(URL, LOGIN, PASS);
+             PreparedStatement ps = con.prepareStatement(
+                 "SELECT m.id, e1.nom AS equipe_domicile, e2.nom AS equipe_exterieur, m.championnat_id, s.nom AS stade, a.nom AS arbitre, m.date_match, m.score_domicile, m.score_exterieur " +
+                 "FROM Matchs m " +
+                 "JOIN Equipe e1 ON m.equipe_domicile = e1.id " +
+                 "JOIN Equipe e2 ON m.equipe_exterieur = e2.id " +
+                 "JOIN Stade s ON m.stade_id = s.id " +
+                 "JOIN Arbitre a ON m.arbitre_id = a.id " +
+                 "ORDER BY m.date_match");
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String equipeDomicile = rs.getString("equipe_domicile");
+                String equipeExterieur = rs.getString("equipe_exterieur");
+                int championnatId = rs.getInt("championnat_id");
+                String stade = rs.getString("stade");
+                String arbitre = rs.getString("arbitre");
+                String dateMatch = rs.getString("date_match");
+                int scoreDomicile = rs.getInt("score_domicile");
+                int scoreExterieur = rs.getInt("score_exterieur");
+
+                matches.add(new MatchPanel.Match(id, equipeDomicile, equipeExterieur, championnatId, stade, arbitre, dateMatch, scoreDomicile, scoreExterieur));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return matches;
+    }
+
+    // Méthode de mise à jour du match
+    public int modifierMatch(int matchId, int equipeDomicile, int equipeExterieur, int championnatId, int stadeId, int arbitreId, String dateMatch) {
+        int retour = 0;
+        try (Connection con = DriverManager.getConnection(URL, LOGIN, PASS);
+             PreparedStatement ps = con.prepareStatement("UPDATE Matchs SET equipe_domicile = ?, equipe_exterieur = ?, championnat_id = ?, stade_id = ?, arbitre_id = ?, date_match = ? WHERE id = ?")) {
+
+            ps.setInt(1, equipeDomicile);
+            ps.setInt(2, equipeExterieur);
+            ps.setInt(3, championnatId);
+            ps.setInt(4, stadeId);
+            ps.setInt(5, arbitreId);
+            ps.setString(6, dateMatch);
+            ps.setInt(7, matchId);
+            retour = ps.executeUpdate();
+
+            System.out.println("Match modifié : ID " + matchId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return retour;
+    }
+
+
+
+
+
+
+
+
+
+
     /**
      * Test du DAO
      */

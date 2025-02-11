@@ -1,7 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class Main extends JFrame {
     private CardLayout cardLayout;
@@ -17,13 +15,20 @@ public class Main extends JFrame {
         // Création du menu
         JMenuBar menuBar = new JMenuBar();
         JMenu menuGestion = new JMenu("Gestion");
+
+        // Menu Items existants
         JMenuItem menuItemEquipes = new JMenuItem("Gérer les Équipes");
         JMenuItem menuItemMatchs = new JMenuItem("Gérer les Matchs");
         JMenuItem menuItemClassement = new JMenuItem("Voir Classement");
 
+        // Nouveau Menu Item pour les clubs
+        //JMenuItem menuItemClubs = new JMenuItem("Gérer les Clubs");
+
         menuGestion.add(menuItemEquipes);
         menuGestion.add(menuItemMatchs);
         menuGestion.add(menuItemClassement);
+        //menuGestion.add(menuItemClubs);  // Ajout du nouvel item pour les clubs
+
         menuBar.add(menuGestion);
         setJMenuBar(menuBar);
 
@@ -34,8 +39,9 @@ public class Main extends JFrame {
         // Ajouter les différentes sections
         mainPanel.add(new AccueilPanel(), "Accueil");
         mainPanel.add(new EquipesPanel(), "Équipes");
-        mainPanel.add(new MatchsPanel(), "Matchs");
+        mainPanel.add(new MatchPanel(), "Matchs");
         mainPanel.add(new ClassementPanel(), "Classement");
+        //mainPanel.add(new ClubsPanel(), "Clubs");  
 
         add(mainPanel);
 
@@ -43,6 +49,7 @@ public class Main extends JFrame {
         menuItemEquipes.addActionListener(e -> cardLayout.show(mainPanel, "Équipes"));
         menuItemMatchs.addActionListener(e -> cardLayout.show(mainPanel, "Matchs"));
         menuItemClassement.addActionListener(e -> cardLayout.show(mainPanel, "Classement"));
+        //menuItemClubs.addActionListener(e -> cardLayout.show(mainPanel, "Clubs")); 
     }
 
     public static void main(String[] args) {
@@ -53,22 +60,11 @@ public class Main extends JFrame {
     }
 }
 
-// === PANELS POUR CHAQUE SECTION ===
-
 // Panel Accueil
 class AccueilPanel extends JPanel {
     public AccueilPanel() {
         setLayout(new BorderLayout());
         JLabel label = new JLabel("Bienvenue dans l'application de gestion du championnat", JLabel.CENTER);
-        add(label, BorderLayout.CENTER);
-    }
-}
-
-// Panel Gestion des Équipes (à compléter avec des JTable, boutons...)
-class EquipesPanel extends JPanel {
-    public EquipesPanel() {
-        setLayout(new BorderLayout());
-        JLabel label = new JLabel("Gestion des Équipes", JLabel.CENTER);
         add(label, BorderLayout.CENTER);
     }
 }

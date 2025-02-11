@@ -31,7 +31,7 @@ public class StadeDAO {
         return 0;
     }
 
-    // Récupérer la liste des stades
+    // Récupérer la liste des stades avec le format "Nom - Ville"
     public List<String> getListeStades() {
         List<String> stades = new ArrayList<>();
         String query = "SELECT * FROM Stade";
@@ -39,13 +39,36 @@ public class StadeDAO {
              PreparedStatement ps = con.prepareStatement(query);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                stades.add("ID: " + rs.getInt("id") + " - Nom: " + rs.getString("nom") +
-                        " - Ville: " + rs.getString("ville") + " - Capacité: " + rs.getInt("capacite"));
+                stades.add(rs.getString("nom") + " - " + rs.getString("ville"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return stades;
+    }
+
+    // Nouvelle méthode pour obtenir l'ID du stade à partir du libellé "Nom - Ville"
+    public int getStadeIdByDisplay(String display) {
+        int id = -1;
+        // On s'attend à un format "Nom - Ville"
+        String[] parts = display.split(" - ");
+        if (parts.length < 2) return id;
+        String nom = parts[0].trim();
+        String ville = parts[1].trim();
+        String query = "SELECT id FROM Stade WHERE nom = ? AND ville = ?";
+        try (Connection con = DriverManager.getConnection(URL, LOGIN, PASS);
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setString(1, nom);
+            ps.setString(2, ville);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    id = rs.getInt("id");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return id;
     }
 
     // Mettre à jour un stade
