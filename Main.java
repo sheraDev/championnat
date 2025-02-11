@@ -19,14 +19,14 @@ public class Main extends JFrame {
         // Menu Items existants
         JMenuItem menuItemEquipes = new JMenuItem("Gérer les Équipes");
         JMenuItem menuItemMatchs = new JMenuItem("Gérer les Matchs");
-        JMenuItem menuItemClassement = new JMenuItem("Voir Classement");
+        //JMenuItem menuItemClassement = new JMenuItem("Voir Classement");
 
         // Nouveau Menu Item pour les clubs
         //JMenuItem menuItemClubs = new JMenuItem("Gérer les Clubs");
 
         menuGestion.add(menuItemEquipes);
         menuGestion.add(menuItemMatchs);
-        menuGestion.add(menuItemClassement);
+       // menuGestion.add(menuItemClassement);
         //menuGestion.add(menuItemClubs);  // Ajout du nouvel item pour les clubs
 
         menuBar.add(menuGestion);
@@ -40,7 +40,7 @@ public class Main extends JFrame {
         mainPanel.add(new AccueilPanel(), "Accueil");
         mainPanel.add(new EquipesPanel(), "Équipes");
         mainPanel.add(new MatchPanel(), "Matchs");
-        mainPanel.add(new ClassementPanel(), "Classement");
+        //mainPanel.add(new ClassementPanel(), "Classement");
         //mainPanel.add(new ClubsPanel(), "Clubs");  
 
         add(mainPanel);
@@ -48,7 +48,7 @@ public class Main extends JFrame {
         // Gestion des événements du menu
         menuItemEquipes.addActionListener(e -> cardLayout.show(mainPanel, "Équipes"));
         menuItemMatchs.addActionListener(e -> cardLayout.show(mainPanel, "Matchs"));
-        menuItemClassement.addActionListener(e -> cardLayout.show(mainPanel, "Classement"));
+        //menuItemClassement.addActionListener(e -> cardLayout.show(mainPanel, "Classement"));
         //menuItemClubs.addActionListener(e -> cardLayout.show(mainPanel, "Clubs")); 
     }
 
@@ -79,6 +79,7 @@ class MatchsPanel extends JPanel {
 }
 
 // Panel Classement (à compléter)
+/*
 class ClassementPanel extends JPanel {
     public ClassementPanel() {
         setLayout(new BorderLayout());
@@ -86,3 +87,4 @@ class ClassementPanel extends JPanel {
         add(label, BorderLayout.CENTER);
     }
 }
+*/
