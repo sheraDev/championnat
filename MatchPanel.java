@@ -1,6 +1,9 @@
+
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,7 +76,7 @@ public class MatchPanel extends JPanel {
         });
 
         // ---------- Partie formulaire d'ajout/modification ----------
-        // On passe à une grille à 9 lignes (ajout de la ligne Statut)
+        // Utilisation d'une grille à 9 lignes (la ligne "Statut" est ajoutée)
         JPanel formPanel = new JPanel(new GridLayout(9, 2, 5, 5));
         
         formPanel.add(new JLabel("Équipe Domicile:"));
@@ -139,6 +142,34 @@ public class MatchPanel extends JPanel {
         buttonPanel.add(addButton);
         buttonPanel.add(modifyButton);
         buttonPanel.add(deleteButton);
+
+        // Bouton pour ajouter un arbitre
+        JButton addArbitreButton = new JButton("Ajouter Arbitre");
+        buttonPanel.add(addArbitreButton);
+        addArbitreButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String nomArbitre = JOptionPane.showInputDialog(
+                        MatchPanel.this,
+                        "Entrez le nom de l'arbitre :",
+                        "Ajouter Arbitre",
+                        JOptionPane.QUESTION_MESSAGE);
+                if (nomArbitre != null && !nomArbitre.trim().isEmpty()) {
+                    int result = arbitreDAO.ajouterArbitre(nomArbitre.trim());
+                    if (result > 0) {
+                        JOptionPane.showMessageDialog(MatchPanel.this, "Arbitre ajouté avec succès !");
+                        // Mise à jour du combo "arbitreCombo"
+                        arbitreCombo.removeAllItems();
+                        List<String> newArbitres = arbitreDAO.getListeArbitres();
+                        for (String arbitre : newArbitres) {
+                            arbitreCombo.addItem(arbitre);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(MatchPanel.this, "Erreur lors de l'ajout de l'arbitre.");
+                    }
+                }
+            }
+        });
 
         JPanel southPanel = new JPanel(new BorderLayout());
         southPanel.add(formPanel, BorderLayout.CENTER);

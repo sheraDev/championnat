@@ -26,10 +26,9 @@ DROP TABLE IF EXISTS `Arbitre`;
 CREATE TABLE `Arbitre` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nom` varchar(100) NOT NULL,
-  `categorie` enum('Principal','Assistant','Vidéo') NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `nom` (`nom`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -46,32 +45,6 @@ CREATE TABLE `Championnat` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `nom` (`nom`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `Classement`
---
-
-DROP TABLE IF EXISTS `Classement`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Classement` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `equipe_id` int(11) NOT NULL,
-  `championnat_id` int(11) NOT NULL,
-  `points` int(11) DEFAULT 0,
-  `victoires` int(11) DEFAULT 0,
-  `defaites` int(11) DEFAULT 0,
-  `matchs_nuls` int(11) DEFAULT 0,
-  `buts_pour` int(11) DEFAULT 0,
-  `buts_contre` int(11) DEFAULT 0,
-  `difference_buts` int(11) DEFAULT 0,
-  PRIMARY KEY (`id`),
-  KEY `equipe_id` (`equipe_id`),
-  KEY `championnat_id` (`championnat_id`),
-  CONSTRAINT `Classement_ibfk_1` FOREIGN KEY (`equipe_id`) REFERENCES `Equipe` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `Classement_ibfk_2` FOREIGN KEY (`championnat_id`) REFERENCES `Championnat` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -107,7 +80,7 @@ CREATE TABLE `Equipe` (
   UNIQUE KEY `nom` (`nom`),
   KEY `club_id` (`club_id`),
   CONSTRAINT `Equipe_ibfk_1` FOREIGN KEY (`club_id`) REFERENCES `Club` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -127,6 +100,7 @@ CREATE TABLE `Matchs` (
   `date_match` datetime NOT NULL,
   `score_domicile` int(11) DEFAULT 0,
   `score_exterieur` int(11) DEFAULT 0,
+  `statut` enum('prevu','annule','realise') NOT NULL DEFAULT 'prevu',
   PRIMARY KEY (`id`),
   KEY `equipe_domicile` (`equipe_domicile`),
   KEY `equipe_exterieur` (`equipe_exterieur`),
@@ -138,26 +112,7 @@ CREATE TABLE `Matchs` (
   CONSTRAINT `Matchs_ibfk_3` FOREIGN KEY (`championnat_id`) REFERENCES `Championnat` (`id`) ON DELETE CASCADE,
   CONSTRAINT `Matchs_ibfk_4` FOREIGN KEY (`stade_id`) REFERENCES `Stade` (`id`) ON DELETE CASCADE,
   CONSTRAINT `Matchs_ibfk_5` FOREIGN KEY (`arbitre_id`) REFERENCES `Arbitre` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `Resultat`
---
-
-DROP TABLE IF EXISTS `Resultat`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Resultat` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `match_id` int(11) NOT NULL,
-  `score` varchar(10) NOT NULL,
-  `PointEquipeDomicile` int(11) NOT NULL,
-  `PointEquipeVisiteur` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `match_id` (`match_id`),
-  CONSTRAINT `Resultat_ibfk_1` FOREIGN KEY (`match_id`) REFERENCES `Matchs` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -186,4 +141,4 @@ CREATE TABLE `Stade` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-02-10 15:18:10
+-- Dump completed on 2025-02-11 14:13:57
