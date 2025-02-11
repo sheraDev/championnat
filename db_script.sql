@@ -28,7 +28,7 @@ CREATE TABLE `Arbitre` (
   `nom` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `nom` (`nom`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -76,11 +76,12 @@ CREATE TABLE `Equipe` (
   `club_id` int(11) NOT NULL,
   `division` varchar(50) NOT NULL,
   `sexe` enum('M','F') NOT NULL,
+  `niveau` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `nom` (`nom`),
   KEY `club_id` (`club_id`),
   CONSTRAINT `Equipe_ibfk_1` FOREIGN KEY (`club_id`) REFERENCES `Club` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -141,4 +142,4 @@ CREATE TABLE `Stade` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-02-11 14:13:57
+-- Dump completed on 2025-02-11 14:58:23
