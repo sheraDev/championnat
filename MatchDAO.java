@@ -20,12 +20,13 @@ public class MatchDAO {
     }
 
     /**
-     * Ajouter un match dans la base de données
+     * Ajouter un match dans la base de données.
      */
-    public int ajouterMatch(int equipeDomicile, int equipeExterieur, int championnatId, int stadeId, int arbitreId, String dateMatch) {
+    public int ajouterMatch(int equipeDomicile, int equipeExterieur, int championnatId, int stadeId, int arbitreId, String dateMatch, int scoreDomicile, int scoreExterieur) {
         int retour = 0;
+        String sql = "INSERT INTO Matchs (equipe_domicile, equipe_exterieur, championnat_id, stade_id, arbitre_id, date_match, score_domicile, score_exterieur) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = DriverManager.getConnection(URL, LOGIN, PASS);
-             PreparedStatement ps = con.prepareStatement("INSERT INTO Matchs (equipe_domicile, equipe_exterieur, championnat_id, stade_id, arbitre_id, date_match) VALUES (?, ?, ?, ?, ?, ?)")) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, equipeDomicile);
             ps.setInt(2, equipeExterieur);
@@ -33,6 +34,8 @@ public class MatchDAO {
             ps.setInt(4, stadeId);
             ps.setInt(5, arbitreId);
             ps.setString(6, dateMatch);
+            ps.setInt(7, scoreDomicile);
+            ps.setInt(8, scoreExterieur);
             retour = ps.executeUpdate();
 
             System.out.println("Match ajouté : " + equipeDomicile + " vs " + equipeExterieur + " - " + dateMatch);
@@ -43,23 +46,25 @@ public class MatchDAO {
     }
 
     /**
-     * Récupèrer la liste des matchs
+     * Récupère la liste des matchs sous forme de chaînes.
      */
     public List<String> getListeMatchs() {
         List<String> matchs = new ArrayList<>();
+        String sql = "SELECT m.id, e1.nom AS equipe_domicile, e2.nom AS equipe_exterieur, c.nom AS championnat, s.nom AS stade, a.nom AS arbitre, m.date_match, m.score_domicile, m.score_exterieur " +
+                     "FROM Matchs m " +
+                     "JOIN Equipe e1 ON m.equipe_domicile = e1.id " +
+                     "JOIN Equipe e2 ON m.equipe_exterieur = e2.id " +
+                     "JOIN Championnat c ON m.championnat_id = c.id " +
+                     "JOIN Stade s ON m.stade_id = s.id " +
+                     "JOIN Arbitre a ON m.arbitre_id = a.id " +
+                     "ORDER BY m.date_match";
         try (Connection con = DriverManager.getConnection(URL, LOGIN, PASS);
-             PreparedStatement ps = con.prepareStatement(
-                 "SELECT m.id, e1.nom AS equipe_domicile, e2.nom AS equipe_exterieur, s.nom AS stade, a.nom AS arbitre, m.date_match, m.score_domicile, m.score_exterieur " +
-                 "FROM Matchs m " +
-                 "JOIN Equipe e1 ON m.equipe_domicile = e1.id " +
-                 "JOIN Equipe e2 ON m.equipe_exterieur = e2.id " +
-                 "JOIN Stade s ON m.stade_id = s.id " +
-                 "JOIN Arbitre a ON m.arbitre_id = a.id " +
-                 "ORDER BY m.date_match");
+             PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 matchs.add(rs.getString("equipe_domicile") + " vs " + rs.getString("equipe_exterieur") +
+                           " | Championnat: " + rs.getString("championnat") +
                            " | Stade: " + rs.getString("stade") +
                            " | Arbitre: " + rs.getString("arbitre") +
                            " | Date: " + rs.getString("date_match") +
@@ -76,8 +81,9 @@ public class MatchDAO {
      */
     public int mettreAJourScore(int matchId, int scoreDomicile, int scoreExterieur) {
         int retour = 0;
+        String sql = "UPDATE Matchs SET score_domicile = ?, score_exterieur = ? WHERE id = ?";
         try (Connection con = DriverManager.getConnection(URL, LOGIN, PASS);
-             PreparedStatement ps = con.prepareStatement("UPDATE Matchs SET score_domicile = ?, score_exterieur = ? WHERE id = ?")) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, scoreDomicile);
             ps.setInt(2, scoreExterieur);
@@ -96,8 +102,9 @@ public class MatchDAO {
      */
     public int supprimerMatch(int matchId) {
         int retour = 0;
+        String sql = "DELETE FROM Matchs WHERE id = ?";
         try (Connection con = DriverManager.getConnection(URL, LOGIN, PASS);
-             PreparedStatement ps = con.prepareStatement("DELETE FROM Matchs WHERE id = ?")) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, matchId);
             retour = ps.executeUpdate();
@@ -109,33 +116,35 @@ public class MatchDAO {
         return retour;
     }
 
-
-    // Nouvelle méthode pour retourner la liste des matchs sous forme d'objets
+    /**
+     * Retourne la liste des matchs sous forme d'objets.
+     */
     public List<MatchPanel.Match> getListeMatchsObjects() {
         List<MatchPanel.Match> matches = new ArrayList<>();
+        String sql = "SELECT m.id, e1.nom AS equipe_domicile, e2.nom AS equipe_exterieur, c.nom AS championnat, s.nom AS stade, a.nom AS arbitre, m.date_match, m.score_domicile, m.score_exterieur " +
+                     "FROM Matchs m " +
+                     "JOIN Equipe e1 ON m.equipe_domicile = e1.id " +
+                     "JOIN Equipe e2 ON m.equipe_exterieur = e2.id " +
+                     "JOIN Championnat c ON m.championnat_id = c.id " +
+                     "JOIN Stade s ON m.stade_id = s.id " +
+                     "JOIN Arbitre a ON m.arbitre_id = a.id " +
+                     "ORDER BY m.date_match";
         try (Connection con = DriverManager.getConnection(URL, LOGIN, PASS);
-             PreparedStatement ps = con.prepareStatement(
-                 "SELECT m.id, e1.nom AS equipe_domicile, e2.nom AS equipe_exterieur, m.championnat_id, s.nom AS stade, a.nom AS arbitre, m.date_match, m.score_domicile, m.score_exterieur " +
-                 "FROM Matchs m " +
-                 "JOIN Equipe e1 ON m.equipe_domicile = e1.id " +
-                 "JOIN Equipe e2 ON m.equipe_exterieur = e2.id " +
-                 "JOIN Stade s ON m.stade_id = s.id " +
-                 "JOIN Arbitre a ON m.arbitre_id = a.id " +
-                 "ORDER BY m.date_match");
+             PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String equipeDomicile = rs.getString("equipe_domicile");
                 String equipeExterieur = rs.getString("equipe_exterieur");
-                int championnatId = rs.getInt("championnat_id");
+                String championnat = rs.getString("championnat");
                 String stade = rs.getString("stade");
                 String arbitre = rs.getString("arbitre");
                 String dateMatch = rs.getString("date_match");
                 int scoreDomicile = rs.getInt("score_domicile");
                 int scoreExterieur = rs.getInt("score_exterieur");
 
-                matches.add(new MatchPanel.Match(id, equipeDomicile, equipeExterieur, championnatId, stade, arbitre, dateMatch, scoreDomicile, scoreExterieur));
+                matches.add(new MatchPanel.Match(id, equipeDomicile, equipeExterieur, championnat, stade, arbitre, dateMatch, scoreDomicile, scoreExterieur));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -143,11 +152,14 @@ public class MatchDAO {
         return matches;
     }
 
-    // Méthode de mise à jour du match
-    public int modifierMatch(int matchId, int equipeDomicile, int equipeExterieur, int championnatId, int stadeId, int arbitreId, String dateMatch) {
+    /**
+     * Met à jour un match.
+     */
+    public int modifierMatch(int matchId, int equipeDomicile, int equipeExterieur, int championnatId, int stadeId, int arbitreId, String dateMatch, int scoreDomicile, int scoreExterieur) {
         int retour = 0;
+        String sql = "UPDATE Matchs SET equipe_domicile = ?, equipe_exterieur = ?, championnat_id = ?, stade_id = ?, arbitre_id = ?, date_match = ?, score_domicile = ?, score_exterieur = ? WHERE id = ?";
         try (Connection con = DriverManager.getConnection(URL, LOGIN, PASS);
-             PreparedStatement ps = con.prepareStatement("UPDATE Matchs SET equipe_domicile = ?, equipe_exterieur = ?, championnat_id = ?, stade_id = ?, arbitre_id = ?, date_match = ? WHERE id = ?")) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, equipeDomicile);
             ps.setInt(2, equipeExterieur);
@@ -155,7 +167,9 @@ public class MatchDAO {
             ps.setInt(4, stadeId);
             ps.setInt(5, arbitreId);
             ps.setString(6, dateMatch);
-            ps.setInt(7, matchId);
+            ps.setInt(7, scoreDomicile);
+            ps.setInt(8, scoreExterieur);
+            ps.setInt(9, matchId);
             retour = ps.executeUpdate();
 
             System.out.println("Match modifié : ID " + matchId);
@@ -165,23 +179,14 @@ public class MatchDAO {
         return retour;
     }
 
-
-
-
-
-
-
-
-
-
     /**
-     * Test du DAO
+     * Test du DAO.
      */
     public static void main(String[] args) {
         MatchDAO matchDAO = new MatchDAO();
 
-        // Exemple d'ajout de match
-        int matchId = matchDAO.ajouterMatch(1, 2, 1, 1, 1, "2024-03-10 15:00:00");
+        // Exemple d'ajout de match (avec scores initialisés à 0)
+        int matchId = matchDAO.ajouterMatch(1, 2, 1, 1, 1, "2024-03-10 15:00:00", 0, 0);
 
         // Affichage des matchs
         List<String> matchs = matchDAO.getListeMatchs();

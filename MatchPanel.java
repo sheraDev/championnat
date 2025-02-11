@@ -15,8 +15,9 @@ public class MatchPanel extends JPanel {
     private JComboBox<String> championnatCombo; // Pour le championnat
     private JComboBox<String> stadeCombo;        // Pour le stade
     private JComboBox<String> arbitreCombo;
-    //private JTextField arbitreField;
     private JTextField dateMatchField;
+    private JTextField scoreDomicileField;       // Champ pour le score domicile
+    private JTextField scoreExterieurField;      // Champ pour le score extérieur
 
     // Boutons d'actions
     private JButton addButton;
@@ -59,18 +60,18 @@ public class MatchPanel extends JPanel {
                     // Remplissage des champs du formulaire
                     equipeDomicileCombo.setSelectedItem(selectedMatch.getEquipeDomicile());
                     equipeExterieurCombo.setSelectedItem(selectedMatch.getEquipeExterieur());
-                    // Pour le championnat, on suppose que le JComboBox contient des items du type "NomChampionnat - Saison : XXXX-XXXX"
-                    // Pour le stade, le combo contient le format "Nom - Ville"
+                    championnatCombo.setSelectedItem(selectedMatch.getChampionnat());
                     stadeCombo.setSelectedItem(selectedMatch.getStade());
-                    //arbitreField.setText(selectedMatch.getArbitre());
                     arbitreCombo.setSelectedItem(selectedMatch.getArbitre());
                     dateMatchField.setText(selectedMatch.getDateMatch());
+                    scoreDomicileField.setText(String.valueOf(selectedMatch.getScoreDomicile()));
+                    scoreExterieurField.setText(String.valueOf(selectedMatch.getScoreExterieur()));
                 }
             }
         });
 
         // ---------- Partie formulaire d'ajout/modification ----------
-        JPanel formPanel = new JPanel(new GridLayout(7, 2, 5, 5));
+        JPanel formPanel = new JPanel(new GridLayout(8, 2, 5, 5));
         
         formPanel.add(new JLabel("Équipe Domicile:"));
         equipeDomicileCombo = new JComboBox<>();
@@ -100,20 +101,24 @@ public class MatchPanel extends JPanel {
 
         formPanel.add(new JLabel("Arbitre:"));
         arbitreCombo = new JComboBox<>();
-        // Remplissage initial du combo pour stades (format "Nom - Ville")
+        // Remplissage initial du combo pour arbitres
         List<String> arbitres = arbitreDAO.getListeArbitres();
         for (String arbitre : arbitres) {
             arbitreCombo.addItem(arbitre);
         }
         formPanel.add(arbitreCombo);
 
-       /* formPanel.add(new JLabel("Arbitre ID:"));
-        arbitreField = new JTextField();
-        formPanel.add(arbitreField);  */
-
         formPanel.add(new JLabel("Date du Match (YYYY-MM-DD HH:MM:SS):"));
         dateMatchField = new JTextField();
         formPanel.add(dateMatchField);
+        
+        formPanel.add(new JLabel("Score Domicile:"));
+        scoreDomicileField = new JTextField();
+        formPanel.add(scoreDomicileField);
+        
+        formPanel.add(new JLabel("Score Extérieur:"));
+        scoreExterieurField = new JTextField();
+        formPanel.add(scoreExterieurField);
 
         // ---------- Boutons d'actions ----------
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
@@ -145,10 +150,8 @@ public class MatchPanel extends JPanel {
     private void refreshEquipeCombos() {
         List<Equipe> equipes = equipeDAO.getListeEquipes();
         equipeDomicileCombo.removeAllItems();
-        // Correction de la variable : utiliser "equipeExterieurCombo" (sans "t" supplémentaire)
         equipeExterieurCombo.removeAllItems();
         for (Equipe eq : equipes) {
-            // On suppose que Equipe a une méthode getNom()
             equipeDomicileCombo.addItem(eq.getNom());
             equipeExterieurCombo.addItem(eq.getNom());
         }
@@ -171,7 +174,7 @@ public class MatchPanel extends JPanel {
         int idDomicile = equipeDAO.getEquipeId(eqDomicile);
         int idExterieur = equipeDAO.getEquipeId(eqExterieur);
 
-        // Récupérer l'ID du championnat depuis le combo
+        // Extraction du nom du championnat à partir du libellé (ex : "Ligue 1 - Saison : 2024-2025")
         String selectedChampionnat = (String) championnatCombo.getSelectedItem();
         String championnatName = selectedChampionnat.split(" - ")[0].trim();
         int championnatId = championnatDAO.getChampionnatId(championnatName);
@@ -182,20 +185,25 @@ public class MatchPanel extends JPanel {
 
         String selectedArbitre = (String) arbitreCombo.getSelectedItem();
         int arbitreId = arbitreDAO.getArbitreIdByDisplay(selectedArbitre);
-       /* try {
-            arbitreId = Integer.parseInt(arbitreField.getText().trim());
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Veuillez entrer une valeur numérique valide pour l'Arbitre.");
-            return;
-        }*/
 
         String dateMatch = dateMatchField.getText().trim();
         if (dateMatch.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Veuillez entrer la date du match.");
             return;
         }
+        
+        // Récupération et vérification des scores
+        int scoreDomicile, scoreExterieur;
+        try {
+            scoreDomicile = Integer.parseInt(scoreDomicileField.getText().trim());
+            scoreExterieur = Integer.parseInt(scoreExterieurField.getText().trim());
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Veuillez entrer des valeurs numériques valides pour les scores.");
+            return;
+        }
 
-        int result = matchDAO.ajouterMatch(idDomicile, idExterieur, championnatId, stadeId, arbitreId, dateMatch);
+        // Appel au DAO mis à jour pour ajouter le match avec les scores
+        int result = matchDAO.ajouterMatch(idDomicile, idExterieur, championnatId, stadeId, arbitreId, dateMatch, scoreDomicile, scoreExterieur);
         if (result > 0) {
             JOptionPane.showMessageDialog(this, "Match ajouté avec succès !");
             loadMatches();
@@ -228,21 +236,22 @@ public class MatchPanel extends JPanel {
         String selectedArbitre = (String) arbitreCombo.getSelectedItem();
         int arbitreId = arbitreDAO.getArbitreIdByDisplay(selectedArbitre);
 
-      /*  int arbitreId;
-        try {
-            arbitreId = Integer.parseInt(arbitreField.getText().trim());
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Veuillez entrer une valeur numérique valide pour l'Arbitre.");
-            return;
-        }*/
-
         String dateMatch = dateMatchField.getText().trim();
         if (dateMatch.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Veuillez entrer la date du match.");
             return;
         }
+        
+        int scoreDomicile, scoreExterieur;
+        try {
+            scoreDomicile = Integer.parseInt(scoreDomicileField.getText().trim());
+            scoreExterieur = Integer.parseInt(scoreExterieurField.getText().trim());
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Veuillez entrer des valeurs numériques valides pour les scores.");
+            return;
+        }
 
-        int result = matchDAO.modifierMatch(selectedMatchId, idDomicile, idExterieur, championnatId, stadeId, arbitreId, dateMatch);
+        int result = matchDAO.modifierMatch(selectedMatchId, idDomicile, idExterieur, championnatId, stadeId, arbitreId, dateMatch, scoreDomicile, scoreExterieur);
         if (result > 0) {
             JOptionPane.showMessageDialog(this, "Match modifié avec succès !");
             loadMatches();
@@ -286,8 +295,9 @@ public class MatchPanel extends JPanel {
         championnatCombo.setSelectedIndex(0);
         stadeCombo.setSelectedIndex(0);
         arbitreCombo.setSelectedIndex(0);
-        //arbitreField.setText("");
         dateMatchField.setText("");
+        scoreDomicileField.setText("");
+        scoreExterieurField.setText("");
     }
 
     // --- Modèle de table personnalisé pour les matchs ---
@@ -321,7 +331,7 @@ public class MatchPanel extends JPanel {
                 case 0: return m.getId();
                 case 1: return m.getEquipeDomicile();
                 case 2: return m.getEquipeExterieur();
-                case 3: return m.getChampionnatId(); // Vous pouvez adapter pour afficher le libellé complet
+                case 3: return m.getChampionnat();
                 case 4: return m.getStade();
                 case 5: return m.getArbitre();
                 case 6: return m.getDateMatch();
@@ -344,19 +354,19 @@ public class MatchPanel extends JPanel {
         private int id;
         private String equipeDomicile;
         private String equipeExterieur;
-        private int championnatId;
+        private String championnat; // Stocke le nom du championnat
         private String stade;
         private String arbitre;
         private String dateMatch;
         private int scoreDomicile;
         private int scoreExterieur;
 
-        public Match(int id, String equipeDomicile, String equipeExterieur, int championnatId,
+        public Match(int id, String equipeDomicile, String equipeExterieur, String championnat,
                      String stade, String arbitre, String dateMatch, int scoreDomicile, int scoreExterieur) {
             this.id = id;
             this.equipeDomicile = equipeDomicile;
             this.equipeExterieur = equipeExterieur;
-            this.championnatId = championnatId;
+            this.championnat = championnat;
             this.stade = stade;
             this.arbitre = arbitre;
             this.dateMatch = dateMatch;
@@ -376,8 +386,8 @@ public class MatchPanel extends JPanel {
             return equipeExterieur;
         }
 
-        public int getChampionnatId() {
-            return championnatId;
+        public String getChampionnat() {
+            return championnat;
         }
 
         public String getStade() {
