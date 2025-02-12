@@ -1,4 +1,3 @@
-
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
@@ -7,12 +6,18 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The MatchPanel class provides a user interface for managing matches.
+ * It displays a table of matches and offers a form to add, modify, or delete matches.
+ * The panel interacts with various DAOs (MatchDAO, EquipeDAO, ChampionnatDAO, StadeDAO, ArbitreDAO)
+ * to retrieve and update data.
+ */
 public class MatchPanel extends JPanel {
-    // Tableau et modèle pour afficher les matchs
+    // Table and model for displaying matches
     private JTable matchTable;
     private MatchTableModel tableModel;
 
-    // Composants du formulaire
+    // Form components
     private JComboBox<String> equipeDomicileCombo;
     private JComboBox<String> equipeExterieurCombo;
     private JComboBox<String> championnatCombo; 
@@ -23,23 +28,27 @@ public class MatchPanel extends JPanel {
     private JTextField scoreDomicileField;       
     private JTextField scoreExterieurField;      
 
-    // Boutons d'actions
+    // Action buttons
     private JButton addButton;
     private JButton modifyButton;
     private JButton deleteButton;
 
-    // DAO
+    // Data Access Objects (DAOs)
     private MatchDAO matchDAO;
     private EquipeDAO equipeDAO;
     private ChampionnatDAO championnatDAO;
     private StadeDAO stadeDAO;
     private ArbitreDAO arbitreDAO;
 
-    // Pour mémoriser l'ID du match sélectionné
+    // To store the ID of the selected match
     private Integer selectedMatchId = null;
 
+    /**
+     * Constructs a new MatchPanel, initializes the UI components, loads initial data,
+     * and sets up event listeners.
+     */
     public MatchPanel() {
-        // Instanciation des DAO
+        // Instantiate DAOs
         matchDAO = new MatchDAO();
         equipeDAO = new EquipeDAO();
         championnatDAO = new ChampionnatDAO();
@@ -47,21 +56,21 @@ public class MatchPanel extends JPanel {
         arbitreDAO = new ArbitreDAO();
         setLayout(new BorderLayout(10, 10));
 
-        // ---------- Partie affichage (tableau des matchs) ----------
+        // ---------- Display Section (Matches Table) ----------
         tableModel = new MatchTableModel();
         matchTable = new JTable(tableModel);
         JScrollPane tableScrollPane = new JScrollPane(matchTable);
         tableScrollPane.setPreferredSize(new Dimension(900, 200));
         add(tableScrollPane, BorderLayout.NORTH);
 
-        // Écoute sur la sélection dans le tableau pour remplir le formulaire
+        // Listener for table selection to populate the form fields
         matchTable.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 int selectedRow = matchTable.getSelectedRow();
                 if (selectedRow != -1) {
                     Match selectedMatch = tableModel.getMatchAt(selectedRow);
                     selectedMatchId = selectedMatch.getId();
-                    // Remplissage des champs du formulaire
+                    // Populate form fields with the selected match's data
                     equipeDomicileCombo.setSelectedItem(selectedMatch.getEquipeDomicile());
                     equipeExterieurCombo.setSelectedItem(selectedMatch.getEquipeExterieur());
                     championnatCombo.setSelectedItem(selectedMatch.getChampionnat());
@@ -75,8 +84,8 @@ public class MatchPanel extends JPanel {
             }
         });
 
-        // ---------- Partie formulaire d'ajout/modification ----------
-        // Utilisation d'une grille à 9 lignes (la ligne "Statut" est ajoutée)
+        // ---------- Form Section for Adding/Modifying Matches ----------
+        // Using a grid layout with 9 rows and 2 columns (the "Statut" row is included)
         JPanel formPanel = new JPanel(new GridLayout(9, 2, 5, 5));
         
         formPanel.add(new JLabel("Équipe Domicile:"));
@@ -89,7 +98,7 @@ public class MatchPanel extends JPanel {
 
         formPanel.add(new JLabel("Championnat:"));
         championnatCombo = new JComboBox<>();
-        // Remplissage initial du combo pour championnats
+        // Initial population of the championship combo box
         List<String> championnats = championnatDAO.getListeChampionnat();
         for (String champ : championnats) {
             championnatCombo.addItem(champ);
@@ -98,7 +107,7 @@ public class MatchPanel extends JPanel {
 
         formPanel.add(new JLabel("Stade:"));
         stadeCombo = new JComboBox<>();
-        // Remplissage initial du combo pour stades (format "Nom - Ville")
+        // Initial population of the stadium combo box (format "Name - City")
         List<String> stades = stadeDAO.getListeStades();
         for (String stade : stades) {
             stadeCombo.addItem(stade);
@@ -107,7 +116,7 @@ public class MatchPanel extends JPanel {
 
         formPanel.add(new JLabel("Arbitre:"));
         arbitreCombo = new JComboBox<>();
-        // Remplissage initial du combo pour arbitres
+        // Initial population of the referee combo box
         List<String> arbitres = arbitreDAO.getListeArbitres();
         for (String arbitre : arbitres) {
             arbitreCombo.addItem(arbitre);
@@ -120,7 +129,7 @@ public class MatchPanel extends JPanel {
         
         formPanel.add(new JLabel("Statut:"));
         statutCombo = new JComboBox<>();
-        // Valeurs possibles pour le statut
+        // Possible values for the match status
         statutCombo.addItem("prevu");
         statutCombo.addItem("annule");
         statutCombo.addItem("realise");
@@ -134,7 +143,7 @@ public class MatchPanel extends JPanel {
         scoreExterieurField = new JTextField();
         formPanel.add(scoreExterieurField);
 
-        // ---------- Boutons d'actions ----------
+        // ---------- Action Buttons ----------
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         addButton = new JButton("Ajouter Match");
         modifyButton = new JButton("Modifier Match");
@@ -143,7 +152,7 @@ public class MatchPanel extends JPanel {
         buttonPanel.add(modifyButton);
         buttonPanel.add(deleteButton);
 
-        // Bouton pour ajouter un arbitre
+        // Button to add a referee
         JButton addArbitreButton = new JButton("Ajouter Arbitre");
         buttonPanel.add(addArbitreButton);
         addArbitreButton.addActionListener(new ActionListener() {
@@ -158,7 +167,7 @@ public class MatchPanel extends JPanel {
                     int result = arbitreDAO.ajouterArbitre(nomArbitre.trim());
                     if (result > 0) {
                         JOptionPane.showMessageDialog(MatchPanel.this, "Arbitre ajouté avec succès !");
-                        // Mise à jour du combo "arbitreCombo"
+                        // Update the referee combo box
                         arbitreCombo.removeAllItems();
                         List<String> newArbitres = arbitreDAO.getListeArbitres();
                         for (String arbitre : newArbitres) {
@@ -176,18 +185,18 @@ public class MatchPanel extends JPanel {
         southPanel.add(buttonPanel, BorderLayout.SOUTH);
         add(southPanel, BorderLayout.SOUTH);
 
-        // Chargement initial des données
+        // Load initial data
         loadMatches();
         refreshEquipeCombos();
 
-        // Actions sur les boutons
+        // Button actions
         addButton.addActionListener(e -> ajouterMatch());
         modifyButton.addActionListener(e -> modifierMatch());
         deleteButton.addActionListener(e -> supprimerMatch());
     }
 
     /**
-     * Recharge les listes déroulantes des équipes depuis EquipeDAO.
+     * Refreshes the team combo boxes with the list of teams from EquipeDAO.
      */
     private void refreshEquipeCombos() {
         List<Equipe> equipes = equipeDAO.getListeEquipes();
@@ -200,7 +209,7 @@ public class MatchPanel extends JPanel {
     }
 
     /**
-     * Charge la liste des matchs depuis la base et met à jour le tableau.
+     * Loads the list of matches from the database and updates the table model.
      */
     private void loadMatches() {
         List<Match> matches = matchDAO.getListeMatchsObjects();
@@ -208,7 +217,7 @@ public class MatchPanel extends JPanel {
     }
 
     /**
-     * Récupère les informations du formulaire et ajoute un nouveau match dans la base.
+     * Retrieves the information from the form and adds a new match to the database.
      */
     private void ajouterMatch() {
         String eqDomicile = (String) equipeDomicileCombo.getSelectedItem();
@@ -216,12 +225,12 @@ public class MatchPanel extends JPanel {
         int idDomicile = equipeDAO.getEquipeId(eqDomicile);
         int idExterieur = equipeDAO.getEquipeId(eqExterieur);
 
-        // Extraction du nom du championnat à partir du libellé (ex : "Ligue 1 - Saison : 2024-2025")
+        // Extract the championship name from the label (e.g., "Ligue 1 - Saison : 2024-2025")
         String selectedChampionnat = (String) championnatCombo.getSelectedItem();
         String championnatName = selectedChampionnat.split(" - ")[0].trim();
         int championnatId = championnatDAO.getChampionnatId(championnatName);
 
-        // Récupérer l'ID du stade à partir du combo (format "Nom - Ville")
+        // Retrieve the stadium ID from the combo (format "Name - City")
         String selectedStade = (String) stadeCombo.getSelectedItem();
         int stadeId = stadeDAO.getStadeIdByDisplay(selectedStade);
 
@@ -234,7 +243,7 @@ public class MatchPanel extends JPanel {
             return;
         }
         
-        // Récupération et vérification des scores
+        // Retrieve and validate scores
         int scoreDomicile, scoreExterieur;
         try {
             scoreDomicile = Integer.parseInt(scoreDomicileField.getText().trim());
@@ -244,10 +253,10 @@ public class MatchPanel extends JPanel {
             return;
         }
         
-        // Récupération du statut
+        // Retrieve the status
         String statut = (String) statutCombo.getSelectedItem();
 
-        // Appel au DAO mis à jour pour ajouter le match avec le statut et les scores
+        // Call the DAO to add the match with the provided status and scores
         int result = matchDAO.ajouterMatch(idDomicile, idExterieur, championnatId, stadeId, arbitreId, dateMatch, scoreDomicile, scoreExterieur, statut);
         if (result > 0) {
             JOptionPane.showMessageDialog(this, "Match ajouté avec succès !");
@@ -259,7 +268,7 @@ public class MatchPanel extends JPanel {
     }
 
     /**
-     * Modifie le match sélectionné avec les informations du formulaire.
+     * Modifies the selected match using the information from the form.
      */
     private void modifierMatch() {
         if (selectedMatchId == null) {
@@ -310,7 +319,7 @@ public class MatchPanel extends JPanel {
     }
 
     /**
-     * Supprime le match sélectionné de la base.
+     * Deletes the selected match from the database after user confirmation.
      */
     private void supprimerMatch() {
         if (selectedMatchId == null) {
@@ -334,7 +343,7 @@ public class MatchPanel extends JPanel {
     }
 
     /**
-     * Réinitialise les champs du formulaire.
+     * Clears the form fields.
      */
     private void clearForm() {
         equipeDomicileCombo.setSelectedIndex(0);
@@ -348,30 +357,58 @@ public class MatchPanel extends JPanel {
         scoreExterieurField.setText("");
     }
 
-    // --- Modèle de table personnalisé pour les matchs ---
+    // --- Custom Table Model for Matches ---
     class MatchTableModel extends AbstractTableModel {
         private List<Match> matches = new ArrayList<>();
         private final String[] columnNames = {"ID", "Domicile", "Extérieur", "Championnat", "Stade", "Arbitre", "Date", "Statut", "Score D", "Score E"};
 
+        /**
+         * Sets the list of matches to display in the table and refreshes the view.
+         *
+         * @param matches the list of matches
+         */
         public void setMatches(List<Match> matches) {
             this.matches = matches;
             fireTableDataChanged();
         }
 
+        /**
+         * Returns the Match object at the specified row index.
+         *
+         * @param rowIndex the row index
+         * @return the match at the specified row
+         */
         public Match getMatchAt(int rowIndex) {
             return matches.get(rowIndex);
         }
 
+        /**
+         * Returns the number of rows in the table.
+         *
+         * @return the number of matches
+         */
         @Override
         public int getRowCount() {
             return matches.size();
         }
 
+        /**
+         * Returns the number of columns in the table.
+         *
+         * @return the number of columns
+         */
         @Override
         public int getColumnCount() {
             return columnNames.length;
         }
 
+        /**
+         * Returns the value for the cell at the specified row and column.
+         *
+         * @param rowIndex the row index
+         * @param columnIndex the column index
+         * @return the value of the cell
+         */
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             Match m = matches.get(rowIndex);
@@ -390,6 +427,12 @@ public class MatchPanel extends JPanel {
             }
         }
 
+        /**
+         * Returns the name of the column at the specified index.
+         *
+         * @param column the column index
+         * @return the column name
+         */
         @Override
         public String getColumnName(int column) {
             return columnNames[column];
@@ -397,7 +440,7 @@ public class MatchPanel extends JPanel {
     }
 
     /**
-     * Classe interne pour représenter un match.
+     * Inner class representing a match.
      */
     public static class Match {
         private int id;
@@ -411,6 +454,20 @@ public class MatchPanel extends JPanel {
         private int scoreDomicile;
         private int scoreExterieur;
 
+        /**
+         * Constructs a new Match with the specified details.
+         *
+         * @param id the match ID
+         * @param equipeDomicile the home team name
+         * @param equipeExterieur the away team name
+         * @param championnat the championship name
+         * @param stade the stadium name
+         * @param arbitre the referee name
+         * @param dateMatch the match date
+         * @param statut the status of the match
+         * @param scoreDomicile the home team score
+         * @param scoreExterieur the away team score
+         */
         public Match(int id, String equipeDomicile, String equipeExterieur, String championnat,
                      String stade, String arbitre, String dateMatch, String statut, int scoreDomicile, int scoreExterieur) {
             this.id = id;
@@ -425,47 +482,102 @@ public class MatchPanel extends JPanel {
             this.scoreExterieur = scoreExterieur;
         }
 
+        /**
+         * Returns the match ID.
+         *
+         * @return the ID of the match
+         */
         public int getId() {
             return id;
         }
 
+        /**
+         * Returns the home team name.
+         *
+         * @return the home team
+         */
         public String getEquipeDomicile() {
             return equipeDomicile;
         }
 
+        /**
+         * Returns the away team name.
+         *
+         * @return the away team
+         */
         public String getEquipeExterieur() {
             return equipeExterieur;
         }
 
+        /**
+         * Returns the championship name.
+         *
+         * @return the championship
+         */
         public String getChampionnat() {
             return championnat;
         }
 
+        /**
+         * Returns the stadium name.
+         *
+         * @return the stadium
+         */
         public String getStade() {
             return stade;
         }
 
+        /**
+         * Returns the referee name.
+         *
+         * @return the referee
+         */
         public String getArbitre() {
             return arbitre;
         }
 
+        /**
+         * Returns the match date.
+         *
+         * @return the match date
+         */
         public String getDateMatch() {
             return dateMatch;
         }
 
+        /**
+         * Returns the match status.
+         *
+         * @return the status of the match
+         */
         public String getStatut() {
             return statut;
         }
 
+        /**
+         * Returns the home team score.
+         *
+         * @return the score of the home team
+         */
         public int getScoreDomicile() {
             return scoreDomicile;
         }
 
+        /**
+         * Returns the away team score.
+         *
+         * @return the score of the away team
+         */
         public int getScoreExterieur() {
             return scoreExterieur;
         }
     }
 
+    /**
+     * Main method to run the MatchPanel independently.
+     *
+     * @param args command-line arguments (not used)
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Gestion des Matchs");

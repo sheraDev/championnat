@@ -2,31 +2,47 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object (DAO) for managing teams (Equipe) in the database.
+ */
 public class EquipeDAO {
 
-    // Paramètres de connexion à la base de données
+    /**
+     * Database connection URL.
+     */
     private static final String URL = DatabaseConfig.getProperty("db.url");
+
+    /**
+     * Database login username.
+     */
     private static final String LOGIN = DatabaseConfig.getProperty("db.user");
+
+    /**
+     * Database login password.
+     */
     private static final String PASS = DatabaseConfig.getProperty("db.password");
 
-    // Constructeur : charge le driver MariaDB
+    /**
+     * Constructs an EquipeDAO and loads the MariaDB JDBC driver.
+     */
     public EquipeDAO() {
         try {
             Class.forName("org.mariadb.jdbc.Driver");
         } catch (ClassNotFoundException ex) {
-            System.err.println("Erreur : Impossible de charger le driver MariaDB");
+            System.err.println("Error: Unable to load the MariaDB driver");
             ex.printStackTrace();
         }
     }
 
     /**
-     * Ajoute une équipe dans la table Equipe.
-     * @param nom Le nom de l'équipe (doit être unique)
-     * @param clubId L'identifiant du club (clé étrangère référant à la table Club)
-     * @param division La division dans laquelle l'équipe évolue
-     * @param sexe Le sexe de l'équipe ("M" pour masculin ou "F" pour féminin)
-     * @param niveau Le niveau de l'équipe
-     * @return Le nombre de lignes affectées (normalement 1 en cas de succès)
+     * Adds a team to the Equipe table.
+     *
+     * @param nom      the name of the team (should be unique)
+     * @param clubId   the club identifier (foreign key referring to the Club table)
+     * @param division the division in which the team competes
+     * @param sexe     the gender of the team ("M" for male or "F" for female)
+     * @param niveau   the level of the team
+     * @return the number of rows affected (normally 1 if successful)
      */
     public int ajouterEquipe(String nom, int clubId, String division, String sexe, String niveau) {
         int rowsAffected = 0;
@@ -40,7 +56,7 @@ public class EquipeDAO {
             ps.setString(4, sexe);
             ps.setString(5, niveau);
             rowsAffected = ps.executeUpdate();
-            System.out.println("Équipe ajoutée : " + nom);
+            System.out.println("Team added: " + nom);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -48,14 +64,15 @@ public class EquipeDAO {
     }
 
     /**
-     * Modifie une équipe existante dans la table Equipe.
-     * @param ancienNom Le nom de l'équipe à modifier.
-     * @param nouveauNom Le nouveau nom de l'équipe.
-     * @param clubId L'identifiant du club.
-     * @param division La division.
-     * @param sexe Le sexe de l'équipe.
-     * @param niveau Le nouveau niveau de l'équipe.
-     * @return Le nombre de lignes affectées (normalement 1 en cas de succès)
+     * Modifies an existing team in the Equipe table.
+     *
+     * @param ancienNom the current name of the team to modify
+     * @param nouveauNom the new name for the team
+     * @param clubId    the club identifier
+     * @param division  the division of the team
+     * @param sexe      the gender of the team
+     * @param niveau    the new level of the team
+     * @return the number of rows affected (normally 1 if successful)
      */
     public int modifierEquipe(String ancienNom, String nouveauNom, int clubId, String division, String sexe, String niveau) {
         int rowsAffected = 0;
@@ -69,7 +86,7 @@ public class EquipeDAO {
             ps.setString(5, niveau);
             ps.setString(6, ancienNom);
             rowsAffected = ps.executeUpdate();
-            System.out.println("Équipe modifiée : " + nouveauNom);
+            System.out.println("Team modified: " + nouveauNom);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -77,9 +94,10 @@ public class EquipeDAO {
     }
 
     /**
-     * Récupère la liste des équipes enregistrées dans la base de données.
-     * Réalise une jointure avec la table Club pour obtenir le nom du club.
-     * @return Une liste d'objets Equipe
+     * Retrieves the list of teams registered in the database.
+     * Performs a join with the Club table to obtain the club name.
+     *
+     * @return a list of Equipe objects
      */
     public List<Equipe> getListeEquipes() {
         List<Equipe> equipes = new ArrayList<>();
@@ -104,9 +122,10 @@ public class EquipeDAO {
     }
 
     /**
-     * Supprime une équipe de la base de données à partir de son nom.
-     * @param nom Le nom de l'équipe à supprimer
-     * @return Le nombre de lignes affectées (normalement 1 en cas de succès)
+     * Deletes a team from the database based on its name.
+     *
+     * @param nom the name of the team to delete
+     * @return the number of rows affected (normally 1 if successful)
      */
     public int supprimerEquipe(String nom) {
         int rowsAffected = 0;
@@ -116,7 +135,7 @@ public class EquipeDAO {
 
             ps.setString(1, nom);
             rowsAffected = ps.executeUpdate();
-            System.out.println("Équipe supprimée : " + nom);
+            System.out.println("Team deleted: " + nom);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -124,9 +143,10 @@ public class EquipeDAO {
     }
 
     /**
-     * Récupère l'identifiant d'une équipe à partir de son nom.
-     * @param nom Le nom de l'équipe.
-     * @return L'identifiant de l'équipe si trouvée, -1 sinon.
+     * Retrieves the identifier of a team based on its name.
+     *
+     * @param nom the name of the team
+     * @return the identifier of the team if found, -1 otherwise
      */
     public int getEquipeId(String nom) {
         int id = -1;

@@ -5,6 +5,10 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The ClubsPanel class is a JPanel that provides a user interface for managing clubs.
+ * It displays a table of clubs and includes a form to add and remove clubs from the database.
+ */
 public class ClubsPanel extends JPanel {
     // Composants d'affichage 
     private JTable clubsTable;
@@ -21,6 +25,10 @@ public class ClubsPanel extends JPanel {
 
     private String selectedClubNom = null;
 
+    /**
+     * Constructs a new ClubsPanel and initializes the user interface components,
+     * including the clubs table and the form for adding clubs.
+     */
     public ClubsPanel() {
         clubDAO = new ClubDAO();
 
@@ -76,7 +84,7 @@ public class ClubsPanel extends JPanel {
     }
 
     /**
-     * Recharge la liste des clubs depuis la BDD et met à jour le tableau.
+     * Reloads the list of clubs from the database and updates the table.
      */
     private void loadClubs() {
         List<Club> clubs = clubDAO.getClubs();
@@ -84,7 +92,7 @@ public class ClubsPanel extends JPanel {
     }
 
     /**
-     * Récupère les informations du formulaire et ajoute un club dans la BDD.
+     * Retrieves the club information from the form and adds the club to the database.
      */
     private void ajouterClub() {
         String nom = nomField.getText().trim();
@@ -106,7 +114,7 @@ public class ClubsPanel extends JPanel {
     }
 
     /**
-     * Supprime le club sélectionné de la BDD après confirmation.
+     * Deletes the selected club from the database after user confirmation.
      */
     private void supprimerClub() {
         if (selectedClubNom == null) {
@@ -130,7 +138,7 @@ public class ClubsPanel extends JPanel {
     }
 
     /**
-     * Réinitialise les champs du formulaire.
+     * Clears the input fields of the form.
      */
     private void clearForm() {
         nomField.setText("");
@@ -138,31 +146,59 @@ public class ClubsPanel extends JPanel {
     }
 
     /**
-     * Modèle de table personnalisé pour afficher la liste des clubs.
+     * A custom table model for displaying the list of clubs in a JTable.
      */
     class ClubsTableModel extends AbstractTableModel {
         private List<Club> clubs = new ArrayList<>();
         private final String[] columnNames = {"ID", "Nom", "Ville"};
 
+        /**
+         * Sets the list of clubs to be displayed in the table and refreshes the view.
+         *
+         * @param clubs the list of clubs
+         */
         public void setClubs(List<Club> clubs) {
             this.clubs = clubs;
             fireTableDataChanged();
         }
 
+        /**
+         * Returns the Club object at the specified row index.
+         *
+         * @param rowIndex the row index
+         * @return the Club at the specified row
+         */
         public Club getClubAt(int rowIndex) {
             return clubs.get(rowIndex);
         }
 
+        /**
+         * Returns the number of rows in the table model.
+         *
+         * @return the number of clubs
+         */
         @Override
         public int getRowCount() {
             return clubs.size();
         }
 
+        /**
+         * Returns the number of columns in the table model.
+         *
+         * @return the number of columns
+         */
         @Override
         public int getColumnCount() {
             return columnNames.length;
         }
 
+        /**
+         * Returns the value for the cell at the specified row and column.
+         *
+         * @param rowIndex the row index
+         * @param columnIndex the column index
+         * @return the value at the specified cell
+         */
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             Club club = clubs.get(rowIndex);
@@ -174,12 +210,23 @@ public class ClubsPanel extends JPanel {
             }
         }
 
+        /**
+         * Returns the name of the column at the specified index.
+         *
+         * @param column the column index
+         * @return the name of the column
+         */
         @Override
         public String getColumnName(int column) {
             return columnNames[column];
         }
     }
 
+    /**
+     * The main method to run the ClubsPanel application.
+     *
+     * @param args command-line arguments (not used)
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Gestion des Clubs");

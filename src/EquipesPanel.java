@@ -5,45 +5,55 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The EquipesPanel class provides a graphical user interface for managing teams.
+ * It displays a table of teams and includes a form to add, modify, or delete teams from the database.
+ * This panel interacts with EquipeDAO and ClubDAO for data access.
+ */
 public class EquipesPanel extends JPanel {
-    // Composants d'affichage (tableau)
+
+    // Display components (table)
     private JTable equipeTable;
     private EquipeTableModel tableModel;
 
-    // Composants du formulaire
+    // Form components
     private JTextField nomField;
     private JTextField divisionField;
     private JTextField niveauField;  
     private JComboBox<String> clubCombo; 
     private JComboBox<String> sexeCombo;
 
-    // Boutons pour les opérations
+    // Operation buttons
     private JButton addButton;
     private JButton modifyButton;
     private JButton deleteButton;
 
-    // Accès aux données via les DAO
+    // Data access objects
     private EquipeDAO equipeDAO;
     private ClubDAO clubDAO;
 
-    // Pour garder en mémoire le nom original de l'équipe sélectionnée
+    // Stores the original name of the selected team
     private String selectedEquipeNom = null;
 
+    /**
+     * Constructs a new EquipesPanel, initializing the user interface components,
+     * loading initial data for teams and clubs, and setting up event listeners.
+     */
     public EquipesPanel() {
-        // Instanciation des DAO existants
+        // Instantiate the existing DAOs
         equipeDAO = new EquipeDAO();
         clubDAO = new ClubDAO();
 
         setLayout(new BorderLayout(10, 10));
 
-        // ---------- Partie affichage (tableau des équipes) ----------
+        // ---------- Display section (teams table) ----------
         tableModel = new EquipeTableModel();
         equipeTable = new JTable(tableModel);
         JScrollPane tableScrollPane = new JScrollPane(equipeTable);
         tableScrollPane.setPreferredSize(new Dimension(800, 200));
         add(tableScrollPane, BorderLayout.NORTH);
 
-        // Écouteur sur la sélection du tableau pour remplir le formulaire
+        // Listener for table selection to populate the form
         equipeTable.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 int selectedRow = equipeTable.getSelectedRow();
@@ -65,7 +75,7 @@ public class EquipesPanel extends JPanel {
             }
         });
 
-        // ---------- Partie formulaire d'ajout/modification ----------
+        // ---------- Form section for adding/modifying teams ----------
         JPanel formPanel = new JPanel(new GridLayout(5, 2, 5, 5));
         
         formPanel.add(new JLabel("Nom de l'équipe :"));
@@ -75,7 +85,7 @@ public class EquipesPanel extends JPanel {
         formPanel.add(new JLabel("Club :"));
         clubCombo = new JComboBox<>();
         
-        // Remplissage initial du comboBox avec la liste des clubs
+        // Initial filling of the combo box with the list of clubs
         List<String> clubs = clubDAO.getListeClubs();
         for (String club : clubs) {
             clubCombo.addItem(club);
@@ -95,7 +105,7 @@ public class EquipesPanel extends JPanel {
         sexeCombo = new JComboBox<>(sexes);
         formPanel.add(sexeCombo);
 
-        // ---------- Boutons d'actions ----------
+        // ---------- Action buttons ----------
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         addButton = new JButton("Ajouter Équipe");
         modifyButton = new JButton("Modifier Équipe");
@@ -107,22 +117,21 @@ public class EquipesPanel extends JPanel {
         buttonPanel.add(deleteButton);
         buttonPanel.add(addClubPopupButton);
 
-        // Conteneur pour le formulaire et les boutons
+        // Container for the form and buttons
         JPanel southPanel = new JPanel(new BorderLayout());
         southPanel.add(formPanel, BorderLayout.CENTER);
         southPanel.add(buttonPanel, BorderLayout.SOUTH);
         add(southPanel, BorderLayout.SOUTH);
 
-        // Chargement initial des équipes depuis la base
+        // Initial loading of teams from the database
         loadEquipes();
 
-        // Actions sur les boutons
+        // Button actions
         addButton.addActionListener(e -> ajouterEquipe());
         modifyButton.addActionListener(e -> modifierEquipe());
         deleteButton.addActionListener(e -> supprimerEquipe());
-        addClubPopupButton.addActionListener(e -> 
-        {
-            // Fenêtre modale pour la gestion des clubs
+        addClubPopupButton.addActionListener(e -> {
+            // Modal window for club management
             JDialog clubDialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Gestion des Clubs", Dialog.ModalityType.APPLICATION_MODAL);
             clubDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             clubDialog.setContentPane(new ClubsPanel());
@@ -134,7 +143,7 @@ public class EquipesPanel extends JPanel {
     }
 
     /**
-     * Méthode pour rafraîchir la liste des clubs dans le comboBox.
+     * Refreshes the list of clubs in the combo box.
      */
     private void refreshClubCombo() {
         List<String> clubs = clubDAO.getListeClubs();
@@ -145,7 +154,7 @@ public class EquipesPanel extends JPanel {
     }
 
     /**
-     * Charge la liste des équipes depuis la base et met à jour le tableau.
+     * Loads the list of teams from the database and updates the table.
      */
     private void loadEquipes() {
         List<Equipe> equipes = equipeDAO.getListeEquipes();
@@ -153,7 +162,7 @@ public class EquipesPanel extends JPanel {
     }
 
     /**
-     * Récupère les informations du formulaire et ajoute une nouvelle équipe dans la base.
+     * Retrieves team information from the form and adds a new team to the database.
      */
     private void ajouterEquipe() {
         String nom = nomField.getText().trim();
@@ -163,7 +172,7 @@ public class EquipesPanel extends JPanel {
         String clubDisplay = (String) clubCombo.getSelectedItem();
         String clubName = clubDisplay.split(" - ")[0].trim();
 
-        if (nom.isEmpty() || division.isEmpty() || clubName.isEmpty() || niveau.isEmpty()) {  // Vérification du niveau aussi
+        if (nom.isEmpty() || division.isEmpty() || clubName.isEmpty() || niveau.isEmpty()) {  // Also checking the level
             JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs.");
             return;
         }
@@ -185,7 +194,7 @@ public class EquipesPanel extends JPanel {
     }
 
     /**
-     * Modifie l'équipe sélectionnée en utilisant les données du formulaire.
+     * Updates the selected team in the database with the data from the form.
      */
     private void modifierEquipe() {
         if (selectedEquipeNom == null) {
@@ -199,7 +208,7 @@ public class EquipesPanel extends JPanel {
         String clubDisplay = (String) clubCombo.getSelectedItem();
         String clubName = clubDisplay.split(" - ")[0].trim();
 
-        if (nouveauNom.isEmpty() || division.isEmpty() || clubName.isEmpty() || niveau.isEmpty()) {  // Vérification du niveau
+        if (nouveauNom.isEmpty() || division.isEmpty() || clubName.isEmpty() || niveau.isEmpty()) {  // Also checking the level
             JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs.");
             return;
         }
@@ -222,7 +231,7 @@ public class EquipesPanel extends JPanel {
     }
 
     /**
-     * Supprime l'équipe sélectionnée de la base.
+     * Deletes the selected team from the database after user confirmation.
      */
     private void supprimerEquipe() {
         if (selectedEquipeNom == null) {
@@ -246,7 +255,7 @@ public class EquipesPanel extends JPanel {
     }
 
     /**
-     * Réinitialise les champs du formulaire.
+     * Clears the input fields in the form.
      */
     private void clearForm() {
         nomField.setText("");
@@ -257,31 +266,59 @@ public class EquipesPanel extends JPanel {
     }
 
     /**
-     * Modèle de table personnalisé pour afficher la liste des équipes.
+     * Custom table model for displaying the list of teams.
      */
     class EquipeTableModel extends AbstractTableModel {
         private List<Equipe> equipes = new ArrayList<>();
         private final String[] columnNames = {"Nom", "Division", "Sexe", "Club", "Niveau"};
 
+        /**
+         * Sets the list of teams to display in the table and refreshes the view.
+         *
+         * @param equipes the list of teams
+         */
         public void setEquipes(List<Equipe> equipes) {
             this.equipes = equipes;
             fireTableDataChanged();
         }
 
+        /**
+         * Returns the Equipe object at the specified row index.
+         *
+         * @param rowIndex the row index in the table
+         * @return the team at the specified row
+         */
         public Equipe getEquipeAt(int rowIndex) {
             return equipes.get(rowIndex);
         }
 
+        /**
+         * Returns the number of rows in the table.
+         *
+         * @return the number of teams
+         */
         @Override
         public int getRowCount() {
             return equipes.size();
         }
 
+        /**
+         * Returns the number of columns in the table.
+         *
+         * @return the number of columns
+         */
         @Override
         public int getColumnCount() {
             return columnNames.length;
         }
 
+        /**
+         * Returns the value for the cell at the specified row and column.
+         *
+         * @param rowIndex the row index
+         * @param columnIndex the column index
+         * @return the value of the cell
+         */
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             Equipe eq = equipes.get(rowIndex);
@@ -295,13 +332,23 @@ public class EquipesPanel extends JPanel {
             }
         }
 
+        /**
+         * Returns the name of the column at the specified index.
+         *
+         * @param column the column index
+         * @return the name of the column
+         */
         @Override
         public String getColumnName(int column) {
             return columnNames[column];
         }
     }
 
-    // Méthode main pour tester le panel indépendamment
+    /**
+     * Main method to test the EquipesPanel independently.
+     *
+     * @param args command-line arguments (not used)
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Gestion des Équipes");

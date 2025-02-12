@@ -2,13 +2,17 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object (DAO) for the Arbitre entity.
+ */
 public class ArbitreDAO {
     private static final String URL = DatabaseConfig.getProperty("db.url");
     private static final String LOGIN = DatabaseConfig.getProperty("db.user");
     private static final String PASS = DatabaseConfig.getProperty("db.password");
 
-
-
+    /**
+     * Constructs an ArbitreDAO and attempts to load the MariaDB JDBC driver.
+     */
     public ArbitreDAO() {
         try {
             Class.forName("org.mariadb.jdbc.Driver");
@@ -19,11 +23,13 @@ public class ArbitreDAO {
     }
 
     /**
-     * Ajoute un arbitre dans la table Arbitre.
-     * Ici, l'ID est auto-incrémenté dans la base.
+     * Adds a referee to the Arbitre table.
+     * <p>
+     * The ID is auto-incremented in the database.
+     * </p>
      *
-     * @param nom Le nom de l'arbitre.
-     * @return Le nombre de lignes affectées (normalement 1 en cas de succès).
+     * @param nom the name of the referee.
+     * @return the number of rows affected (normally 1 on success).
      */
     public int ajouterArbitre(String nom) {
         int retour = 0;
@@ -40,9 +46,9 @@ public class ArbitreDAO {
     }
 
     /**
-     * Récupère la liste des arbitres enregistrés dans la base de données.
+     * Retrieves the list of referees registered in the database.
      *
-     * @return Une liste de chaînes contenant le nom de chaque arbitre.
+     * @return a list of strings containing the name of each referee.
      */
     public List<String> getListeArbitres() {
         List<String> arbitres = new ArrayList<>();
@@ -60,10 +66,10 @@ public class ArbitreDAO {
     }
 
     /**
-     * Supprime un arbitre de la base de données à partir de son nom.
+     * Deletes a referee from the database based on their name.
      *
-     * @param nom Le nom de l'arbitre à supprimer.
-     * @return Le nombre de lignes affectées (normalement 1 en cas de succès).
+     * @param nom the name of the referee to delete.
+     * @return the number of rows affected (normally 1 on success).
      */
     public int supprimerArbitre(String nom) {
         int retour = 0;
@@ -80,10 +86,13 @@ public class ArbitreDAO {
     }
 
     /**
-     * Récupère l'identifiant d'un arbitre à partir d'une chaîne de type "Nom - ..." ou simplement "Nom".
+     * Retrieves the ID of a referee based on a display string.
+     * <p>
+     * The display string can be in the format "Name - ..." or simply "Name".
+     * </p>
      *
-     * @param display La chaîne d'affichage contenant le nom (possiblement suivie d'un séparateur " - " et d'autres informations).
-     * @return L'identifiant de l'arbitre s'il est trouvé, -1 sinon.
+     * @param display the display string containing the referee's name (possibly followed by " - " and additional information).
+     * @return the ID of the referee if found, or -1 otherwise.
      */
     public int getArbitreIdByDisplay(String display) {
         int id = -1;

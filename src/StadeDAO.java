@@ -2,11 +2,17 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object (DAO) for managing stadiums.
+ */
 public class StadeDAO {
     private static final String URL = DatabaseConfig.getProperty("db.url");
     private static final String LOGIN = DatabaseConfig.getProperty("db.user");
     private static final String PASS = DatabaseConfig.getProperty("db.password");
 
+    /**
+     * Constructs a new StadeDAO and loads the MariaDB JDBC driver.
+     */
     public StadeDAO() {
         try {
             Class.forName("org.mariadb.jdbc.Driver");
@@ -16,7 +22,14 @@ public class StadeDAO {
         }
     }
 
-    // Ajouter un stade
+    /**
+     * Adds a new stadium to the database.
+     *
+     * @param nom     the name of the stadium
+     * @param ville   the city where the stadium is located
+     * @param capacite the capacity of the stadium
+     * @return the number of rows affected (typically 1 if successful)
+     */
     public int ajouterStade(String nom, String ville, int capacite) {
         String query = "INSERT INTO Stade (nom, ville, capacite) VALUES (?, ?, ?)";
         try (Connection con = DriverManager.getConnection(URL, LOGIN, PASS);
@@ -31,7 +44,11 @@ public class StadeDAO {
         return 0;
     }
 
-    // Récupérer la liste des stades avec le format "Nom - Ville"
+    /**
+     * Retrieves a list of stadiums formatted as "Name - City".
+     *
+     * @return a list of strings representing the stadiums
+     */
     public List<String> getListeStades() {
         List<String> stades = new ArrayList<>();
         String query = "SELECT * FROM Stade";
@@ -47,10 +64,15 @@ public class StadeDAO {
         return stades;
     }
 
-    // Nouvelle méthode pour obtenir l'ID du stade à partir du libellé "Nom - Ville"
+    /**
+     * Retrieves the stadium ID based on its display label formatted as "Name - City".
+     *
+     * @param display the display string in the format "Name - City"
+     * @return the stadium ID if found; -1 otherwise
+     */
     public int getStadeIdByDisplay(String display) {
         int id = -1;
-        // On s'attend à un format "Nom - Ville"
+        // Expected format "Name - City"
         String[] parts = display.split(" - ");
         if (parts.length < 2) return id;
         String nom = parts[0].trim();
@@ -71,7 +93,15 @@ public class StadeDAO {
         return id;
     }
 
-    // Mettre à jour un stade
+    /**
+     * Updates an existing stadium in the database.
+     *
+     * @param id      the stadium ID to update
+     * @param nom     the new name of the stadium
+     * @param ville   the new city of the stadium
+     * @param capacite the new capacity of the stadium
+     * @return the number of rows affected (typically 1 if successful)
+     */
     public int mettreAJourStade(int id, String nom, String ville, int capacite) {
         String query = "UPDATE Stade SET nom = ?, ville = ?, capacite = ? WHERE id = ?";
         try (Connection con = DriverManager.getConnection(URL, LOGIN, PASS);
@@ -87,7 +117,12 @@ public class StadeDAO {
         return 0;
     }
 
-    // Supprimer un stade
+    /**
+     * Deletes a stadium from the database.
+     *
+     * @param id the ID of the stadium to delete
+     * @return the number of rows affected (typically 1 if successful)
+     */
     public int supprimerStade(int id) {
         String query = "DELETE FROM Stade WHERE id = ?";
         try (Connection con = DriverManager.getConnection(URL, LOGIN, PASS);
@@ -100,34 +135,38 @@ public class StadeDAO {
         return 0;
     }
 
-    // Main de test
+    /**
+     * Main method for testing the StadeDAO functionality.
+     *
+     * @param args command-line arguments (not used)
+     */
     public static void main(String[] args) {
         StadeDAO stadeDAO = new StadeDAO();
 
-        // Ajouter un stade
+        // Add a stadium
         stadeDAO.ajouterStade("Stade de France", "Paris", 80000);
 
-        // Afficher la liste des stades
+        // Display the list of stadiums
         List<String> stades = stadeDAO.getListeStades();
         System.out.println("Liste des stades :");
         for (String stade : stades) {
             System.out.println(stade);
         }
 
-        // Mettre à jour un stade
+        // Update a stadium
         stadeDAO.mettreAJourStade(1, "Parc des Princes", "Paris", 50000);
 
-        // Afficher après mise à jour
+        // Display the list after update
         stades = stadeDAO.getListeStades();
         System.out.println("Liste après mise à jour :");
         for (String stade : stades) {
             System.out.println(stade);
         }
 
-        // Supprimer un stade
+        // Delete a stadium
         stadeDAO.supprimerStade(1);
 
-        // Afficher après suppression
+        // Display the list after deletion
         stades = stadeDAO.getListeStades();
         System.out.println("Liste après suppression :");
         for (String stade : stades) {

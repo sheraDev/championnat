@@ -3,24 +3,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * DAO pour la gestion des matchs.
+ * DAO for managing matches.
  */
 public class MatchDAO {
     private static final String URL = DatabaseConfig.getProperty("db.url");
     private static final String LOGIN = DatabaseConfig.getProperty("db.user");
     private static final String PASS = DatabaseConfig.getProperty("db.password");
 
+    /**
+     * Constructs a new MatchDAO and loads the MariaDB JDBC driver.
+     */
     public MatchDAO() {
         try {
             Class.forName("org.mariadb.jdbc.Driver");
         } catch (ClassNotFoundException e) {
-            System.err.println("Erreur : Impossible de charger le driver MariaDB");
+            System.err.println("Error: Unable to load the MariaDB driver");
             e.printStackTrace();
         }
     }
 
     /**
-     * Ajouter un match dans la base de données.
+     * Adds a match to the database.
+     *
+     * @param equipeDomicile  the ID of the home team
+     * @param equipeExterieur the ID of the away team
+     * @param championnatId  the championship ID
+     * @param stadeId       the stadium ID
+     * @param arbitreId     the referee ID
+     * @param dateMatch     the date of the match
+     * @param scoreDomicile the home team's score
+     * @param scoreExterieur the away team's score
+     * @param statut        the status of the match
+     * @return the number of rows affected (typically 1 if successful)
      */
     public int ajouterMatch(int equipeDomicile, int equipeExterieur, int championnatId, int stadeId, int arbitreId,
                             String dateMatch, int scoreDomicile, int scoreExterieur, String statut) {
@@ -40,7 +54,7 @@ public class MatchDAO {
             ps.setString(9, statut);
             retour = ps.executeUpdate();
 
-            System.out.println("Match ajouté : " + equipeDomicile + " vs " + equipeExterieur + " - " + dateMatch + " - Statut: " + statut);
+            System.out.println("Match added: " + equipeDomicile + " vs " + equipeExterieur + " - " + dateMatch + " - Status: " + statut);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -48,7 +62,9 @@ public class MatchDAO {
     }
 
     /**
-     * Récupère la liste des matchs sous forme de chaînes.
+     * Retrieves the list of matches as formatted strings.
+     *
+     * @return a list of match descriptions
      */
     public List<String> getListeMatchs() {
         List<String> matchs = new ArrayList<>();
@@ -66,11 +82,11 @@ public class MatchDAO {
 
             while (rs.next()) {
                 matchs.add(rs.getString("equipe_domicile") + " vs " + rs.getString("equipe_exterieur") +
-                           " | Championnat: " + rs.getString("championnat") +
-                           " | Stade: " + rs.getString("stade") +
-                           " | Arbitre: " + rs.getString("arbitre") +
+                           " | Championship: " + rs.getString("championnat") +
+                           " | Stadium: " + rs.getString("stade") +
+                           " | Referee: " + rs.getString("arbitre") +
                            " | Date: " + rs.getString("date_match") +
-                           " | Statut: " + rs.getString("statut") +
+                           " | Status: " + rs.getString("statut") +
                            " | Score: " + rs.getInt("score_domicile") + "-" + rs.getInt("score_exterieur"));
             }
         } catch (SQLException e) {
@@ -80,7 +96,12 @@ public class MatchDAO {
     }
 
     /**
-     * Met à jour le score d'un match.
+     * Updates the score of a match.
+     *
+     * @param matchId       the match ID
+     * @param scoreDomicile the home team's new score
+     * @param scoreExterieur the away team's new score
+     * @return the number of rows affected (typically 1 if successful)
      */
     public int mettreAJourScore(int matchId, int scoreDomicile, int scoreExterieur) {
         int retour = 0;
@@ -93,7 +114,7 @@ public class MatchDAO {
             ps.setInt(3, matchId);
             retour = ps.executeUpdate();
 
-            System.out.println("Score mis à jour pour le match ID " + matchId + " : " + scoreDomicile + "-" + scoreExterieur);
+            System.out.println("Score updated for match ID " + matchId + " : " + scoreDomicile + "-" + scoreExterieur);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -101,7 +122,10 @@ public class MatchDAO {
     }
 
     /**
-     * Supprime un match.
+     * Deletes a match from the database.
+     *
+     * @param matchId the ID of the match to delete
+     * @return the number of rows affected (typically 1 if successful)
      */
     public int supprimerMatch(int matchId) {
         int retour = 0;
@@ -112,7 +136,7 @@ public class MatchDAO {
             ps.setInt(1, matchId);
             retour = ps.executeUpdate();
 
-            System.out.println("Match supprimé ID : " + matchId);
+            System.out.println("Match deleted ID : " + matchId);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -120,8 +144,10 @@ public class MatchDAO {
     }
 
     /**
-     * Retourne la liste des matchs sous forme d'objets.
-     * Le champ 'statut' est récupéré et transmis à l'objet Match.
+     * Retrieves the list of matches as objects.
+     * The 'statut' field is retrieved and passed to the Match object.
+     *
+     * @return a list of Match objects
      */
     public List<MatchPanel.Match> getListeMatchsObjects() {
         List<MatchPanel.Match> matches = new ArrayList<>();
@@ -158,8 +184,19 @@ public class MatchDAO {
     }
 
     /**
-     * Met à jour un match.
-     * Le champ 'statut' est également mis à jour.
+     * Updates a match, including its status.
+     *
+     * @param matchId       the match ID
+     * @param equipeDomicile the home team ID
+     * @param equipeExterieur the away team ID
+     * @param championnatId  the championship ID
+     * @param stadeId       the stadium ID
+     * @param arbitreId     the referee ID
+     * @param dateMatch     the match date
+     * @param scoreDomicile the home team's score
+     * @param scoreExterieur the away team's score
+     * @param statut        the status of the match
+     * @return the number of rows affected (typically 1 if successful)
      */
     public int modifierMatch(int matchId, int equipeDomicile, int equipeExterieur, int championnatId, int stadeId,
                              int arbitreId, String dateMatch, int scoreDomicile, int scoreExterieur, String statut) {
@@ -180,14 +217,18 @@ public class MatchDAO {
             ps.setInt(10, matchId);
             retour = ps.executeUpdate();
 
-            System.out.println("Match modifié : ID " + matchId + " - Statut: " + statut);
+            System.out.println("Match updated: ID " + matchId + " - Status: " + statut);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return retour;
     }
 
-    
+    /**
+     * Main method for testing purposes.
+     *
+     * @param args command-line arguments (not used)
+     */
     public static void main(String[] args) {
     }
 }

@@ -1,10 +1,17 @@
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Main class for the Football Championship Management application.
+ * Sets up the main window, navigation menu, and panels.
+ */
 public class Main extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainPanel;
 
+    /**
+     * Constructs the main application window.
+     */
     public Main() {
         // Configuration de la fenêtre principale
         setTitle("Gestion du Championnat de Football");
@@ -19,7 +26,6 @@ public class Main extends JFrame {
         // Menu Items existants
         JMenuItem menuItemEquipes = new JMenuItem("Gérer les Équipes");
         JMenuItem menuItemMatchs = new JMenuItem("Gérer les Matchs");
-
 
         menuGestion.add(menuItemEquipes);
         menuGestion.add(menuItemMatchs);
@@ -43,6 +49,11 @@ public class Main extends JFrame {
         menuItemMatchs.addActionListener(e -> cardLayout.show(mainPanel, "Matchs"));
     }
 
+    /**
+     * Main entry point of the application.
+     *
+     * @param args command-line arguments (not used)
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             Main app = new Main();
@@ -51,20 +62,16 @@ public class Main extends JFrame {
     }
 }
 
-// Panel Accueil
+/**
+ * AccueilPanel displays the welcome screen of the application.
+ */
 class AccueilPanel extends JPanel {
+    /**
+     * Constructs the AccueilPanel.
+     */
     public AccueilPanel() {
         setLayout(new BorderLayout());
         JLabel label = new JLabel("Bienvenue dans l'application de gestion du championnat", JLabel.CENTER);
-        add(label, BorderLayout.CENTER);
-    }
-}
-
-// Panel Gestion des Matchs 
-class MatchsPanel extends JPanel {
-    public MatchsPanel() {
-        setLayout(new BorderLayout());
-        JLabel label = new JLabel("Gestion des Matchs", JLabel.CENTER);
         add(label, BorderLayout.CENTER);
     }
 }
