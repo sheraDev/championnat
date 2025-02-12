@@ -82,9 +82,9 @@ public class MatchDAO {
 
             while (rs.next()) {
                 matchs.add(rs.getString("equipe_domicile") + " vs " + rs.getString("equipe_exterieur") +
-                           " | Championship: " + rs.getString("championnat") +
-                           " | Stadium: " + rs.getString("stade") +
-                           " | Referee: " + rs.getString("arbitre") +
+                           " | Championnat: " + rs.getString("championnat") +
+                           " | Stade: " + rs.getString("stade") +
+                           " | Arbitre: " + rs.getString("arbitre") +
                            " | Date: " + rs.getString("date_match") +
                            " | Status: " + rs.getString("statut") +
                            " | Score: " + rs.getInt("score_domicile") + "-" + rs.getInt("score_exterieur"));

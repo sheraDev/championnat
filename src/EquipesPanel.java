@@ -208,7 +208,7 @@ public class EquipesPanel extends JPanel {
         String clubDisplay = (String) clubCombo.getSelectedItem();
         String clubName = clubDisplay.split(" - ")[0].trim();
 
-        if (nouveauNom.isEmpty() || division.isEmpty() || clubName.isEmpty() || niveau.isEmpty()) {  // Also checking the level
+        if (nouveauNom.isEmpty() || division.isEmpty() || clubName.isEmpty() || niveau.isEmpty()) {  
             JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs.");
             return;
         }
