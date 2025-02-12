@@ -19,15 +19,10 @@ public class Main extends JFrame {
         // Menu Items existants
         JMenuItem menuItemEquipes = new JMenuItem("Gérer les Équipes");
         JMenuItem menuItemMatchs = new JMenuItem("Gérer les Matchs");
-        //JMenuItem menuItemClassement = new JMenuItem("Voir Classement");
 
-        // Nouveau Menu Item pour les clubs
-        //JMenuItem menuItemClubs = new JMenuItem("Gérer les Clubs");
 
         menuGestion.add(menuItemEquipes);
         menuGestion.add(menuItemMatchs);
-       // menuGestion.add(menuItemClassement);
-        //menuGestion.add(menuItemClubs);  // Ajout du nouvel item pour les clubs
 
         menuBar.add(menuGestion);
         setJMenuBar(menuBar);
@@ -40,16 +35,12 @@ public class Main extends JFrame {
         mainPanel.add(new AccueilPanel(), "Accueil");
         mainPanel.add(new EquipesPanel(), "Équipes");
         mainPanel.add(new MatchPanel(), "Matchs");
-        //mainPanel.add(new ClassementPanel(), "Classement");
-        //mainPanel.add(new ClubsPanel(), "Clubs");  
 
         add(mainPanel);
 
         // Gestion des événements du menu
         menuItemEquipes.addActionListener(e -> cardLayout.show(mainPanel, "Équipes"));
         menuItemMatchs.addActionListener(e -> cardLayout.show(mainPanel, "Matchs"));
-        //menuItemClassement.addActionListener(e -> cardLayout.show(mainPanel, "Classement"));
-        //menuItemClubs.addActionListener(e -> cardLayout.show(mainPanel, "Clubs")); 
     }
 
     public static void main(String[] args) {
@@ -69,7 +60,7 @@ class AccueilPanel extends JPanel {
     }
 }
 
-// Panel Gestion des Matchs (à compléter)
+// Panel Gestion des Matchs 
 class MatchsPanel extends JPanel {
     public MatchsPanel() {
         setLayout(new BorderLayout());
@@ -77,14 +68,3 @@ class MatchsPanel extends JPanel {
         add(label, BorderLayout.CENTER);
     }
 }
-
-// Panel Classement (à compléter)
-/*
-class ClassementPanel extends JPanel {
-    public ClassementPanel() {
-        setLayout(new BorderLayout());
-        JLabel label = new JLabel("Classement des Équipes", JLabel.CENTER);
-        add(label, BorderLayout.CENTER);
-    }
-}
-*/

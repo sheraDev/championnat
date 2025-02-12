@@ -1,3 +1,7 @@
+DROP DATABASE IF EXISTS championnat_football;
+CREATE DATABASE championnat_football;
+USE championnat_football;
+
 /*M!999999\- enable the sandbox mode */ 
 -- MariaDB dump 10.19-11.6.2-MariaDB, for Linux (x86_64)
 --
